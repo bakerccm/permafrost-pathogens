@@ -1,4 +1,4 @@
-# PERMAFROST PATHOGENS
+# Permafrost Pathogens
 
 This repo contains code to explore for pathogens in the Alaskan permafrost thaw metagenome dataset.
 
