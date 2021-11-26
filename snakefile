@@ -21,10 +21,12 @@ wildcard_constraints:
 ## get sample and reference genome metadata
 
 import pandas as pd
+import re
 METADATA = pd.read_csv(METADATA_FILE, sep = '\t', index_col = 'sample')
 ALL_SAMPLES = list(METADATA.index)
-READ1_FILES = [sub(".fastq.gz", "", basename(file)) for file in METADATA['read1']]
-READ2_FILES = [sub(".fastq.gz", "", basename(file)) for file in METADATA['read2']]
+# this is not a very clean way to do this:
+READ1_FILES = [re.sub(".fastq.gz", "", basename(file)) for file in METADATA['read1']]
+READ2_FILES = [re.sub(".fastq.gz", "", basename(file)) for file in METADATA['read2']]
 
 ################################
 # default rules
