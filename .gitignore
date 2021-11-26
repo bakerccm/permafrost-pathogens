@@ -1,0 +1,19 @@
+# ignore input and output data
+# note trailing /* is required for use with !.gitkeep
+/data/*
+/out/*
+
+# ignore snakemake working files
+/.snakemake
+/snakemake.err
+/snakemake.out
+
+# ignore resources directory
+/resources
+!/resources/useful_commands.txt # except this file inherited from template
+
+# ignore system files
+.DS_Store
+
+# retain .gitkeep files as placeholders in otherwise empty directories
+!.gitkeep

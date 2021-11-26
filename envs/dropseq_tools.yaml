@@ -1,0 +1,5 @@
+name: dropseq_tools
+channels:
+ - bioconda
+dependencies:
+ - dropseq_tools=2.3.0

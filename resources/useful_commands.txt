@@ -1,0 +1,40 @@
+# USEFUL COMMANDS
+
+####################################
+## conda
+
+    # find packages matching name
+
+        conda search star
+
+    # create environment from file
+
+        conda env create --file envs/dropseq_tools.yaml # env name is specified in .yaml file
+        conda activate dropseq_tools
+
+####################################
+## snakemake
+
+# remember to activate conda environment already set up (see readme.md)
+
+    conda activate snakemake
+
+# display dag
+
+    snakemake -j 1 --use-conda --dag | dot | display # or --rulegraph or --filegraph
+
+    snakemake -j 1 --use-conda --dag | dot -Tpdf >dag.pdf
+    snakemake -j 1 --use-conda --rulegraph | dot -Tpdf >rulegraph.pdf
+    snakemake -j 1 --use-conda --filegraph | dot -Tpdf >filegraph.pdf
+
+# only construct conda environments (provide file or rule etc that will cause a rule to run)
+# (use -n if you just want to see what environments will be created)
+
+  snakemake -j 1 --use-conda --conda-create-envs-only "out/some_output.bam"
+
+# to re-run/continue a killed snakemake run
+
+    snakemake -j 1 --use-conda --unlock -np some_rule
+    snakemake -j 4 --use-conda --rerun-incomplete some_rule
+
+####################################

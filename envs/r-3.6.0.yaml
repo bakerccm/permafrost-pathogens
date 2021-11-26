@@ -1,0 +1,5 @@
+name: r-3.6.0
+channels:
+ - r
+dependencies:
+ - r=3.6.0
