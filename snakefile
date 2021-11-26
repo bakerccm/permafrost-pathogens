@@ -33,35 +33,30 @@ rule all:
 
 rule all_run_fastqc:
     input:
-        ['out/fastqc/' + sample for sample in ALL_SAMPLES]
+        ['out/fastqc/' + fastq + '_fastqc.zip' for fastq in METADATA['read1']],
+        ['out/fastqc/' + fastq + '_fastqc.zip' for fastq in METADATA['read2']]
 
 ################################
 
-# generate fastqc quality reports for the fastq.gz files in each sample
+# generate fastqc quality reports for each fastq.gz file
 rule run_fastqc:
     input:
-        # list of fastq.gz files for each sample which gets supplied to fastqc command separated by spaces
-        read1 = lambda wildcards: METADATA.loc[wildcards.sample,'read1'],
-        read2 = lambda wildcards: METADATA.loc[wildcards.sample,'read2']
+        'data/{fastq}.fastq.gz'
     output:
-        directory('out/fastqc/{sample}')
+        'out/fastqc/{fastq}_fastqc.html',
+        'out/fastqc/{fastq}_fastqc.zip'
     conda:
         'envs/fastqc.yaml'
     shell:
-        '''
-        # remove output directory if it exists; then create new empty directory
-            if [ -d {output} ]; then rm -rf {output}; fi
-                mkdir {output}
-        # run fastqc on each fastq.gz file in the sample
-            fastqc -o {output} {input}
-        '''
+        'fastqc -o out/fastqc {input}'
 
 ################################
 
 # use multiQC to summarize fastqc results
 rule multiQC:
     input:
-        fastqc = expand('out/fastqc/{sample}', sample = ALL_SAMPLES) # .zip files from fastqc
+        fastqc = ['out/fastqc/' + fastq + '_fastqc.zip' for fastq in METADATA['read1']] +
+                 ['out/fastqc/' + fastq + '_fastqc.zip' for fastq in METADATA['read2']]
         #star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
         #featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
         #htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
