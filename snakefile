@@ -45,7 +45,7 @@ rule run_fastqc:
         read1 = lambda wildcards: METADATA.loc[wildcards.sample,'read1'],
         read2 = lambda wildcards: METADATA.loc[wildcards.sample,'read2']
     output:
-        directory('out/fastqc/{sample})
+        directory('out/fastqc/{sample}')
     conda:
         'envs/fastqc.yaml'
     shell:
