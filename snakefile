@@ -22,6 +22,7 @@ wildcard_constraints:
 
 import pandas as pd
 import re
+import os
 METADATA = pd.read_csv(METADATA_FILE, sep = '\t', index_col = 'sample')
 ALL_SAMPLES = list(METADATA.index)
 # this is not a very clean way to do this:
