@@ -37,8 +37,7 @@ rule all_run_fastqc:
 
 ################################
 
-# generate fastqc quality reports for the fastq.gz files in each sample and for concatenated fastq.gz files
-# takes 9 cores, 18GB, 10 min to do all 9 samples
+# generate fastqc quality reports for the fastq.gz files in each sample
 rule run_fastqc:
     input:
         # list of fastq.gz files for each sample which gets supplied to fastqc command separated by spaces
@@ -60,7 +59,6 @@ rule run_fastqc:
 ################################
 
 # use multiQC to summarize fastqc results
-# takes 1 core, 8GB, <2 min in interactive job
 rule multiQC:
     input:
         fastqc = expand('out/fastqc/{sample}', sample = ALL_SAMPLES) # .zip files from fastqc
