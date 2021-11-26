@@ -15,6 +15,7 @@ METADATA_FILE = config['sample_metadata']
 
 wildcard_constraints:
     sample = '[^_/]+',
+    fastq = '[^_/]+',
     file = '[^/\.]+'
 
 ################################
