@@ -29,7 +29,7 @@ ALL_SAMPLES = list(METADATA.index)
 
 rule all:
     input:
-        'out/multiQC'
+        'out/multiqc'
 
 rule all_run_fastqc:
     input:
@@ -68,9 +68,9 @@ rule multiQC:
         #featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
         #htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
     output:
-        directory('out/multiQC')
+        directory('out/multiqc')
     log:
-        'out/multiQC/multiqc_report.log'
+        'out/multiqc/multiqc_report.log'
     conda:
         'envs/multiqc.yaml'
     shell:
