@@ -1,8 +1,8 @@
-# snakefile template
+# snakefile for permafrost pathogens processing and analysis
 
 # Chris Baker
 # https://github.com/bakerccm
-# DD MMMM YYYY
+# 26 November 2021
 
 ################################
 ## get config file
@@ -22,44 +22,60 @@ wildcard_constraints:
 
 import pandas as pd
 METADATA = pd.read_csv(METADATA_FILE, sep = '\t', index_col = 'sample')
-ALL_SAMPLES = list(METADATA[(METADATA['project'] == '1') | (METADATA['project'] == '2')].index)
+ALL_SAMPLES = list(METADATA.index)
 
 ################################
-# default rule
+# default rules
 
 rule all:
     input:
-        expand('out/unaligned/{sample}.bam', sample = ALL_SAMPLES)
+        'out/multiQC'
+
+rule all_run_fastqc:
+    input:
+        ['out/fastqc/' + sample + '/' + sample + '_fastqc.zip' for sample in ALL_SAMPLES]
 
 ################################
-# ensure that fastq files are gzipped
 
-# 50 min per sample
-rule gzip_fastq:
+# generate fastqc quality reports for the fastq.gz files in each sample and for concatenated fastq.gz files
+# takes 9 cores, 18GB, 10 min to do all 9 samples
+rule run_fastqc:
     input:
-        'data/{file}.fastq'
+        # list of fastq.gz files for each sample which gets supplied to fastqc command separated by spaces
+        lambda wildcards: METADATA.loc[wildcards.sample,'read1'],
+        lambda wildcards: METADATA.loc[wildcards.sample,'read2']
     output:
-        'data/{file}.fastq.gz'
-    shell:
-        'gzip {input}'
-
-################################
-# pipeline
-
-# create unaligned bam file for each sample from the fastq.gz files
-# allow ~1 hour per sample for largest samples (15GB of fastq files), 1 core, 3GB memory
-rule unaligned_bamfile:
-    input:
-        read1 = 'data/{sample}_R1.fastq.gz',
-        read2 = 'data/{sample}_R2.fastq.gz'
-    output:
-        'out/unaligned/{sample}.bam'
+        'out/fastqc/{sample}/{sample}_fastqc.zip'
+    params:
+        outdir = 'out/fastqc/{sample}'
     conda:
-        'envs/picard.yaml'
-    #params:
-    #    parameter1 = lambda wildcards: SAMPLES.loc[wildcards.sample,'parameter1']
-    #threads: 4
-    log:
-        'out/unaligned/{sample}.bam.log'
+        'envs/fastqc.yaml'
     shell:
-        'picard FastqToSam F1={input.read1} F2={input.read2} O={output} SM={wildcards.sample} 2>{log}'
+        '''
+        # remove output directory if it exists; then create new empty directory
+            if [ -d {params.outdir} ]; then rm -rf {params.outdir}; fi
+            mkdir {params.outdir}
+        # run fastqc on each fastq.gz file in the sample
+            fastqc -o {params.outdir} {input}
+        '''
+
+################################
+
+# use multiQC to summarize fastqc results
+# takes 1 core, 8GB, <2 min in interactive job
+rule multiQC:
+    input:
+        fastqc = expand('out/fastqc/{sample}/{sample}_fastqc.zip', sample = ALL_SAMPLES) # .zip files from fastqc
+        #star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
+        #featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
+        #htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
+    output:
+        directory('out/multiQC')
+    log:
+        'out/multiQC/multiqc_report.log'
+    conda:
+        'envs/multiqc.yaml'
+    shell:
+        'multiqc -o {output} {input} 2>{log}'
+
+################################
