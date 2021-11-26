@@ -1,5 +1,7 @@
-# snakemake_template
+# PERMAFROST PATHOGENS
 
-Use this repo as a template when setting up a new analysis project with [Snakemake](snakemake.readthedocs.io)
+This repo contains code to explore for pathogens in the Alaskan permafrost thaw metagenome dataset.
+
+---
 
 Maintained by [Chris Baker](https://github.com/bakerccm)
