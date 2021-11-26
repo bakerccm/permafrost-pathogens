@@ -15,7 +15,6 @@ METADATA_FILE = config['sample_metadata']
 
 wildcard_constraints:
     sample = '[^_/]+',
-    fastq = '[^_/]+',
     file = '[^/\.]+'
 
 ################################
@@ -34,18 +33,18 @@ rule all:
 
 rule all_run_fastqc:
     input:
-        ['out/fastqc/' + fastq + '_fastqc.zip' for fastq in METADATA['read1']],
-        ['out/fastqc/' + fastq + '_fastqc.zip' for fastq in METADATA['read2']]
+        ['out/fastqc/' + file + '_fastqc.zip' for file in METADATA['read1']],
+        ['out/fastqc/' + file + '_fastqc.zip' for file in METADATA['read2']]
 
 ################################
 
 # generate fastqc quality reports for each fastq.gz file
 rule run_fastqc:
     input:
-        'data/{fastq}.fastq.gz'
+        'data/{file}.fastq.gz'
     output:
-        'out/fastqc/{fastq}_fastqc.html',
-        'out/fastqc/{fastq}_fastqc.zip'
+        'out/fastqc/{file}_fastqc.html',
+        'out/fastqc/{file}_fastqc.zip'
     conda:
         'envs/fastqc.yaml'
     shell:
@@ -56,8 +55,8 @@ rule run_fastqc:
 # use multiQC to summarize fastqc results
 rule multiQC:
     input:
-        fastqc = ['out/fastqc/' + fastq + '_fastqc.zip' for fastq in METADATA['read1']] +
-                 ['out/fastqc/' + fastq + '_fastqc.zip' for fastq in METADATA['read2']]
+        fastqc = ['out/fastqc/' + file + '_fastqc.zip' for file in METADATA['read1']] +
+                 ['out/fastqc/' + file + '_fastqc.zip' for file in METADATA['read2']]
         #star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
         #featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
         #htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
