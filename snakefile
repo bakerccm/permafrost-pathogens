@@ -26,8 +26,8 @@ import os
 METADATA = pd.read_csv(METADATA_FILE, sep = '\t', index_col = 'sample')
 ALL_SAMPLES = list(METADATA.index)
 # this is not a very clean way to do this:
-READ1_FILES = [re.sub(".fastq.gz", "", basename(file)) for file in METADATA['read1']]
-READ2_FILES = [re.sub(".fastq.gz", "", basename(file)) for file in METADATA['read2']]
+READ1_FILES = [re.sub(".fastq.gz", "", os.path.basename(file)) for file in METADATA['read1']]
+READ2_FILES = [re.sub(".fastq.gz", "", os.path.basename(file)) for file in METADATA['read2']]
 
 ################################
 # default rules
