@@ -23,6 +23,8 @@ wildcard_constraints:
 import pandas as pd
 METADATA = pd.read_csv(METADATA_FILE, sep = '\t', index_col = 'sample')
 ALL_SAMPLES = list(METADATA.index)
+READ1_FILES = [sub(".fastq.gz", "", basename(file)) for file in METADATA['read1']]
+READ2_FILES = [sub(".fastq.gz", "", basename(file)) for file in METADATA['read2']]
 
 ################################
 # default rules
@@ -33,8 +35,8 @@ rule all:
 
 rule all_run_fastqc:
     input:
-        ['out/fastqc/' + file + '_fastqc.zip' for file in METADATA['read1']],
-        ['out/fastqc/' + file + '_fastqc.zip' for file in METADATA['read2']]
+        ['out/fastqc/' + file + '_fastqc.zip' for file in READ1_FILES],
+        ['out/fastqc/' + file + '_fastqc.zip' for file in READ2_FILES]
 
 ################################
 
@@ -55,8 +57,8 @@ rule run_fastqc:
 # use multiQC to summarize fastqc results
 rule multiQC:
     input:
-        fastqc = ['out/fastqc/' + file + '_fastqc.zip' for file in METADATA['read1']] +
-                 ['out/fastqc/' + file + '_fastqc.zip' for file in METADATA['read2']]
+        fastqc = ['out/fastqc/' + file + '_fastqc.zip' for file in READ1_FILES] +
+                 ['out/fastqc/' + file + '_fastqc.zip' for file in READ2_FILES]
         #star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
         #featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
         #htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
