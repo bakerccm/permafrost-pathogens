@@ -15,7 +15,7 @@ METADATA_FILE = config['sample_metadata']
 
 wildcard_constraints:
     sample = '[^_/]+',
-    file = '[^/\.]+'
+    file = '[^/]+'
 
 ################################
 ## get sample and reference genome metadata
