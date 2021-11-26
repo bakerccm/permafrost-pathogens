@@ -51,8 +51,8 @@ rule run_fastqc:
     shell:
         '''
         # remove output directory if it exists; then create new empty directory
-        #    if [ -d {output} ]; then rm -rf {output}; fi
-        #    mkdir {output}
+            if [ -d {output} ]; then rm -rf {output}; fi
+                mkdir {output}
         # run fastqc on each fastq.gz file in the sample
             fastqc -o {output} {input}
         '''
