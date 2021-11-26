@@ -33,7 +33,7 @@ rule all:
 
 rule all_run_fastqc:
     input:
-        ['out/fastqc/' + sample + '/' + sample + '_fastqc.zip' for sample in ALL_SAMPLES]
+        ['out/fastqc/' + sample for sample in ALL_SAMPLES]
 
 ################################
 
@@ -42,21 +42,19 @@ rule all_run_fastqc:
 rule run_fastqc:
     input:
         # list of fastq.gz files for each sample which gets supplied to fastqc command separated by spaces
-        lambda wildcards: METADATA.loc[wildcards.sample,'read1'],
-        lambda wildcards: METADATA.loc[wildcards.sample,'read2']
+        read1 = lambda wildcards: METADATA.loc[wildcards.sample,'read1'],
+        read2 = lambda wildcards: METADATA.loc[wildcards.sample,'read2']
     output:
-        'out/fastqc/{sample}/{sample}_fastqc.zip'
-    params:
-        outdir = 'out/fastqc/{sample}'
+        directory('out/fastqc/{sample})
     conda:
         'envs/fastqc.yaml'
     shell:
         '''
         # remove output directory if it exists; then create new empty directory
-            if [ -d {params.outdir} ]; then rm -rf {params.outdir}; fi
-            mkdir {params.outdir}
+        #    if [ -d {output} ]; then rm -rf {output}; fi
+        #    mkdir {output}
         # run fastqc on each fastq.gz file in the sample
-            fastqc -o {params.outdir} {input}
+            fastqc -o {output} {input}
         '''
 
 ################################
@@ -65,7 +63,7 @@ rule run_fastqc:
 # takes 1 core, 8GB, <2 min in interactive job
 rule multiQC:
     input:
-        fastqc = expand('out/fastqc/{sample}/{sample}_fastqc.zip', sample = ALL_SAMPLES) # .zip files from fastqc
+        fastqc = expand('out/fastqc/{sample}', sample = ALL_SAMPLES) # .zip files from fastqc
         #star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
         #featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
         #htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
