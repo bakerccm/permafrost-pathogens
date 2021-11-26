@@ -1,7 +1,0 @@
-name: monocle3
-channels:
- - bioconda
- - conda-forge
- - defaults
-dependencies:
- - r-monocle3
