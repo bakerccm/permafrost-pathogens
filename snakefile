@@ -9,6 +9,7 @@
 
 configfile: 'config/config.yaml'
 METADATA_FILE = config['sample_metadata']
+RAW_DATA_DIR = config['raw_data_dir']
 
 ################################
 ## wildcard constraints
@@ -25,6 +26,7 @@ import re
 import os
 METADATA = pd.read_csv(METADATA_FILE, sep = '\t', index_col = 'sample')
 ALL_SAMPLES = list(METADATA.index)
+
 # this is not a very clean way to do this:
 #READ1_FILES = [re.sub(".fastq.gz", "", os.path.basename(file)) for file in METADATA['read1']]
 #READ2_FILES = [re.sub(".fastq.gz", "", os.path.basename(file)) for file in METADATA['read2']]
@@ -48,8 +50,8 @@ rule all_raw_data_links:
 ################################
 rule raw_data_link:
     input:
-        read1 = lambda wildcards: METADATA.loc[wildcards.sample,'read1'],
-        read2 = lambda wildcards: METADATA.loc[wildcards.sample,'read2']
+        read1 = lambda wildcards: RAW_DATA_DIR + "/" + METADATA.loc[wildcards.sample,'read1'],
+        read2 = lambda wildcards: RAW_DATA_DIR + "/" + METADATA.loc[wildcards.sample,'read2']
     output:
         read1 = 'out/raw/{sample}_R1.fastq.gz',
         read2 = 'out/raw/{sample}_R2.fastq.gz'
