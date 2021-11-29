@@ -54,8 +54,8 @@ rule raw_data_link:
         read1 = lambda wildcards: RAW_DATA_DIR + "/" + METADATA.loc[wildcards.sample,'read1'],
         read2 = lambda wildcards: RAW_DATA_DIR + "/" + METADATA.loc[wildcards.sample,'read2']
     output:
-        read1 = 'data/raw/{sample}_R1.fastq.gz',
-        read2 = 'data/raw/{sample}_R2.fastq.gz'
+        read1 = 'data/links/{sample}_R1.fastq.gz',
+        read2 = 'data/links/{sample}_R2.fastq.gz'
     shell:
         '''
         ln -s {input.read1} {output.read1}
@@ -72,7 +72,7 @@ rule all_run_fastqc:
 
 rule run_fastqc:
     input:
-        'data/raw/{sample}_{read}.fastq.gz'
+        'data/links/{sample}_{read}.fastq.gz'
     output:
         'out/raw/{sample}_{read}_fastqc.html',
         'out/raw/{sample}_{read}_fastqc.zip'
