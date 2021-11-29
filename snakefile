@@ -67,7 +67,8 @@ rule raw_data_link:
 # generate fastqc quality reports for each fastq.gz file
 
 rule all_run_fastqc:
-    expand('out/raw/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+    input:
+        expand('out/raw/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
 
 rule run_fastqc:
     input:
