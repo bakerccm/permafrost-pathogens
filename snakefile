@@ -26,52 +26,70 @@ import os
 METADATA = pd.read_csv(METADATA_FILE, sep = '\t', index_col = 'sample')
 ALL_SAMPLES = list(METADATA.index)
 # this is not a very clean way to do this:
-READ1_FILES = [re.sub(".fastq.gz", "", os.path.basename(file)) for file in METADATA['read1']]
-READ2_FILES = [re.sub(".fastq.gz", "", os.path.basename(file)) for file in METADATA['read2']]
+#READ1_FILES = [re.sub(".fastq.gz", "", os.path.basename(file)) for file in METADATA['read1']]
+#READ2_FILES = [re.sub(".fastq.gz", "", os.path.basename(file)) for file in METADATA['read2']]
 
 ################################
 # default rules
 
-rule all:
-    input:
-        'out/multiqc'
+# rule all:
+#     input:
+#         'out/multiqc'
 
-rule all_run_fastqc:
+rule all_raw_data_links:
     input:
-        ['out/fastqc/' + file + '_fastqc.zip' for file in READ1_FILES],
-        ['out/fastqc/' + file + '_fastqc.zip' for file in READ2_FILES]
+        expand('out/raw/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'}
+
+#rule all_run_fastqc:
+#    input:
+#        ['out/fastqc/' + file + '_fastqc.zip' for file in READ1_FILES],
+#        ['out/fastqc/' + file + '_fastqc.zip' for file in READ2_FILES]
+
+################################
+rule raw_data_link:
+    input:
+        read1 = lambda wildcards: METADATA.loc[wildcards.sample,'read1'],
+        read2 = lambda wildcards: METADATA.loc[wildcards.sample,'read2']
+    output:
+        read1 = 'out/raw/{sample}_R1.fastq.gz',
+        read2 = 'out/raw/{sample}_R2.fastq.gz'
+    shell:
+        '''
+        ln -s {input.read1} {output.read1}
+        ln -s {input.read2} {output.read2}
+        '''
 
 ################################
 
 # generate fastqc quality reports for each fastq.gz file
-rule run_fastqc:
-    input:
-        'data/{file}.fastq.gz'
-    output:
-        'out/fastqc/{file}_fastqc.html',
-        'out/fastqc/{file}_fastqc.zip'
-    conda:
-        'envs/fastqc.yaml'
-    shell:
-        'fastqc -o out/fastqc {input}'
+# rule run_fastqc:
+#     input:
+#         'data/{file}.fastq.gz'
+#     output:
+#         'out/fastqc/{file}_fastqc.html',
+#         'out/fastqc/{file}_fastqc.zip'
+#     conda:
+#         'envs/fastqc.yaml'
+#     shell:
+#         'fastqc -o out/fastqc {input}'
 
 ################################
 
 # use multiQC to summarize fastqc results
-rule multiQC:
-    input:
-        fastqc = ['out/fastqc/' + file + '_fastqc.zip' for file in READ1_FILES] +
-                 ['out/fastqc/' + file + '_fastqc.zip' for file in READ2_FILES]
-        #star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
-        #featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
-        #htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
-    output:
-        directory('out/multiqc')
-    log:
-        'out/multiqc/multiqc_report.log'
-    conda:
-        'envs/multiqc.yaml'
-    shell:
-        'multiqc -o {output} {input} 2>{log}'
+# rule multiQC:
+#     input:
+#         fastqc = ['out/fastqc/' + file + '_fastqc.zip' for file in READ1_FILES] +
+#                  ['out/fastqc/' + file + '_fastqc.zip' for file in READ2_FILES]
+#         #star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
+#         #featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
+#         #htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
+#     output:
+#         directory('out/multiqc')
+#     log:
+#         'out/multiqc/multiqc_report.log'
+#     conda:
+#         'envs/multiqc.yaml'
+#     shell:
+#         'multiqc -o {output} {input} 2>{log}'
 
 ################################
