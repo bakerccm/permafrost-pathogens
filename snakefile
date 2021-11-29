@@ -38,7 +38,7 @@ ALL_SAMPLES = list(METADATA.index)
 
 rule all_raw_data_links:
     input:
-        expand('out/raw/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'}
+        expand('out/raw/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'})
 
 #rule all_run_fastqc:
 #    input:
