@@ -38,16 +38,17 @@ ALL_SAMPLES = list(METADATA.index)
 #     input:
 #         'out/multiqc'
 
-rule all_raw_data_links:
-    input:
-        expand('data/raw/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'})
-
 #rule all_run_fastqc:
 #    input:
 #        ['out/fastqc/' + file + '_fastqc.zip' for file in READ1_FILES],
 #        ['out/fastqc/' + file + '_fastqc.zip' for file in READ2_FILES]
 
 ################################
+
+rule all_raw_data_links:
+    input:
+        expand('data/raw/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'})
+
 rule raw_data_link:
     input:
         read1 = lambda wildcards: RAW_DATA_DIR + "/" + METADATA.loc[wildcards.sample,'read1'],
@@ -64,16 +65,20 @@ rule raw_data_link:
 ################################
 
 # generate fastqc quality reports for each fastq.gz file
-# rule run_fastqc:
-#     input:
-#         'data/{file}.fastq.gz'
-#     output:
-#         'out/fastqc/{file}_fastqc.html',
-#         'out/fastqc/{file}_fastqc.zip'
-#     conda:
-#         'envs/fastqc.yaml'
-#     shell:
-#         'fastqc -o out/fastqc {input}'
+
+rule all_run_fastqc:
+    expand('out/raw/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+
+rule run_fastqc:
+    input:
+        'data/raw/{sample}_{read}.fastq.gz'
+    output:
+        'out/raw/{sample}_{read}_fastqc.html',
+        'out/raw/{sample}_{read}_fastqc.zip'
+    conda:
+        'envs/fastqc.yaml'
+    shell:
+        'fastqc -o out/raw {input}'
 
 ################################
 
