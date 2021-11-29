@@ -40,7 +40,7 @@ ALL_SAMPLES = list(METADATA.index)
 
 rule all_raw_data_links:
     input:
-        expand('out/raw/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'})
+        expand('data/raw/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'})
 
 #rule all_run_fastqc:
 #    input:
@@ -53,8 +53,8 @@ rule raw_data_link:
         read1 = lambda wildcards: RAW_DATA_DIR + "/" + METADATA.loc[wildcards.sample,'read1'],
         read2 = lambda wildcards: RAW_DATA_DIR + "/" + METADATA.loc[wildcards.sample,'read2']
     output:
-        read1 = 'out/raw/{sample}_R1.fastq.gz',
-        read2 = 'out/raw/{sample}_R2.fastq.gz'
+        read1 = 'data/raw/{sample}_R1.fastq.gz',
+        read2 = 'data/raw/{sample}_R2.fastq.gz'
     shell:
         '''
         ln -s {input.read1} {output.read1}
