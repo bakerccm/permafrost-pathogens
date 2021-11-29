@@ -35,13 +35,8 @@ ALL_SAMPLES = list(METADATA.index)
 # default rules
 
 # rule all:
-#     input:
-#         'out/multiqc'
-
-#rule all_run_fastqc:
-#    input:
-#        ['out/fastqc/' + file + '_fastqc.zip' for file in READ1_FILES],
-#        ['out/fastqc/' + file + '_fastqc.zip' for file in READ2_FILES]
+    input:
+        'out/raw/multiqc'
 
 ################################
 
@@ -68,36 +63,35 @@ rule raw_data_link:
 
 rule all_run_fastqc:
     input:
-        expand('out/raw/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+        expand('out/raw/fastqc/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
 
 rule run_fastqc:
     input:
         'data/links/{sample}_{read}.fastq.gz'
     output:
-        'out/raw/{sample}_{read}_fastqc.html',
-        'out/raw/{sample}_{read}_fastqc.zip'
+        'out/raw/fastqc/{sample}_{read}_fastqc.html',
+        'out/raw/fastqc/{sample}_{read}_fastqc.zip'
     conda:
         'envs/fastqc.yaml'
     shell:
-        'fastqc -o out/raw {input}'
+        'fastqc -o out/raw/fastqc {input}'
 
 ################################
 
 # use multiQC to summarize fastqc results
-# rule multiQC:
-#     input:
-#         fastqc = ['out/fastqc/' + file + '_fastqc.zip' for file in READ1_FILES] +
-#                  ['out/fastqc/' + file + '_fastqc.zip' for file in READ2_FILES]
-#         #star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
-#         #featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
-#         #htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
-#     output:
-#         directory('out/multiqc')
-#     log:
-#         'out/multiqc/multiqc_report.log'
-#     conda:
-#         'envs/multiqc.yaml'
-#     shell:
-#         'multiqc -o {output} {input} 2>{log}'
+rule multiQC:
+    input:
+        fastqc = expand('out/raw/fastqc/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+        #star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
+        #featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
+        #htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
+    output:
+        directory('out/raw/multiqc')
+    log:
+        'out/raw/multiqc/multiqc_report.log'
+    conda:
+        'envs/multiqc.yaml'
+    shell:
+        'multiqc -o {output} {input} 2>{log}'
 
 ################################
