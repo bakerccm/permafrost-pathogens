@@ -2,4 +2,4 @@ sample_metadata:
     "config/samples.tsv"
 
 raw_data_dir:
-    "${WORK}/permafrost-pathogens-data"
+    "${{WORK}}/permafrost-pathogens-data"
