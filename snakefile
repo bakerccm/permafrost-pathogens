@@ -228,10 +228,10 @@ rule fastq_join:
 
 rule fastq_join_fastqc:
     input:
-        'out/fastq-join/{sample}_{read}.fastq.gz'
+        'out/fastq-join/{sample}_join.fastq.gz'
     output:
-        'out/fastq-join/{sample}_{read}_fastqc.html',
-        'out/fastq-join/{sample}_{read}_fastqc.zip'
+        'out/fastq-join/{sample}_join_fastqc.html',
+        'out/fastq-join/{sample}_join_fastqc.zip'
     conda:
         'envs/fastqc.yaml'
     shell:
@@ -239,7 +239,7 @@ rule fastq_join_fastqc:
 
 rule fastq_join_multiQC:
     input:
-        fastqc = expand('out/fastq-join/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+        fastqc = expand('out/fastq-join/{sample}_join_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
     output:
         'out/fastq-join/multiqc_report.html'
     params:
