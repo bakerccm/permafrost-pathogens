@@ -106,8 +106,12 @@ rule cutadapt:
         adapter_rev = config['cutadapt']['adapter_rev']
     conda:
         'envs/cutadapt-3.5.yaml'
+    threads: 8
     shell:
         'cutadapt -a {params.adapter_fwd} -A {params.adapter_rev} -o {output.read1} -p {output.read2} {input.read1} {input.read2}'
 
 # -n 2 -m {params.min_length}
+################################
+
+
 ################################
