@@ -33,7 +33,6 @@ rule all:
         'out/raw/multiqc'
 
 ################################
-
 rule all_raw_data_links:
     input:
         expand('data/raw/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'})
@@ -52,7 +51,6 @@ rule raw_data_link:
         '''
 
 ################################
-
 # generate fastqc quality reports for each fastq.gz file
 
 rule all_run_fastqc:
@@ -71,7 +69,6 @@ rule run_fastqc:
         'fastqc -o out/raw/fastqc {input}'
 
 ################################
-
 # use multiQC to summarize fastqc results
 rule multiQC:
     input:
@@ -90,4 +87,27 @@ rule multiQC:
     shell:
         'multiqc -o {output} {params.inputdir} 2>{log}'
 
+################################
+# remove sequencing adaptors
+
+rule all_cutadapt:
+    input:
+        expand('out/cutadapt/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'})
+
+rule cutadapt:
+    input:
+        read1 = 'data/links/{sample}_R1.fastq.gz',
+        read2 = 'data/links/{sample}_R2.fastq.gz'
+    output:
+        read1 = 'out/cutadapt/{sample}_R1.fastq.gz',
+        read2 = 'out/cutadapt/{sample}_R2.fastq.gz'
+    params:
+        adapter_fwd = config['cutadapt']['adapter_fwd'],
+        adapter_rev = config['cutadapt']['adapter_rev']
+    conda:
+        'envs/cutadapt-3.5.yaml'
+    shell:
+        'cutadapt -a {params.adapter_fwd} -A {params.adapter_rev} -o {output.read1} -p {output.read2} {input.read1} {input.read2}'
+
+# -n 2 -m {params.min_length}
 ################################

@@ -1,5 +1,10 @@
 sample_metadata:
-    "config/samples.tsv"
+    'config/samples.tsv'
 
 raw_data_dir:
-    "/work/08186/cbaker/frontera/permafrost-pathogens-data"
+    '/work/08186/cbaker/frontera/permafrost-pathogens-data'
+
+cutadapt:
+    # both adapter directions are the same
+    adapter_fwd: 'CTGTCTCTTATACACATCT'
+    adapter_rev: 'CTGTCTCTTATACACATCT'
