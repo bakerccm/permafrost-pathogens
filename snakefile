@@ -84,7 +84,7 @@ rule raw_multiQC:
     conda:
         'envs/multiqc.yaml'
     shell:
-        'multiqc -o {params.outputdir} {params.inputdir} 2>{log}'
+        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
 ## use cutadapt to remove sequencing adaptors
@@ -142,7 +142,7 @@ rule cutadapt_multiQC:
     conda:
         'envs/multiqc.yaml'
     shell:
-        'multiqc -o {params.outputdir} {params.inputdir} 2>{log}'
+        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
 ## use sickle to trim and filter reads
@@ -200,7 +200,7 @@ rule sickle_multiQC:
     conda:
         'envs/multiqc.yaml'
     shell:
-        'multiqc -o {params.outputdir} {params.inputdir} 2>{log}'
+        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
 ## use fastq-join from ea-utils to merge paired end reads
@@ -250,6 +250,6 @@ rule fastq_join_multiQC:
     conda:
         'envs/multiqc.yaml'
     shell:
-        'multiqc -o {params.outputdir} {params.inputdir} 2>{log}'
+        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
