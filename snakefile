@@ -103,14 +103,19 @@ rule cutadapt:
         read2 = 'out/cutadapt/{sample}_R2.fastq.gz'
     params:
         adapter_fwd = config['cutadapt']['adapter_fwd'],
-        adapter_rev = config['cutadapt']['adapter_rev']
+        adapter_rev = config['cutadapt']['adapter_rev'],
+        min_length = config['cutadapt']['min_length']
     conda:
         'envs/cutadapt-3.5.yaml'
-    threads: 8
+    threads: 4
     shell:
-        'cutadapt -a {params.adapter_fwd} -A {params.adapter_rev} -j {threads} -o {output.read1} -p {output.read2} {input.read1} {input.read2}'
+        '''
+        cutadapt -a {params.adapter_fwd} -A {params.adapter_rev} \
+        -j {threads} -m {params.min_length} \
+        -o {output.read1} -p {output.read2} {input.read1} {input.read2}
+        '''
 
-# -n 2 -m {params.min_length}
+#
 ################################
 
 rule cutadapt_fastqc:

@@ -8,3 +8,4 @@ cutadapt:
     # both adapter directions are the same
     adapter_fwd: 'CTGTCTCTTATACACATCT'
     adapter_rev: 'CTGTCTCTTATACACATCT'
+    min_length: 50
