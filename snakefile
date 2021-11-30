@@ -178,12 +178,12 @@ rule sickle_fastqc:
     input:
         'out/sickle/{sample}_{read}.fastq.gz'
     output:
-        'out/sickle/fastqc/{sample}_{read}_fastqc.html',
-        'out/sickle/fastqc/{sample}_{read}_fastqc.zip'
+        'out/sickle/{sample}_{read}_fastqc.html',
+        'out/sickle/{sample}_{read}_fastqc.zip'
     conda:
         'envs/fastqc.yaml'
     shell:
-        'fastqc -o out/sickle/fastqc {input}'
+        'fastqc -o out/sickle {input}'
 
 rule sickle_multiQC:
     input:
