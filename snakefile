@@ -30,7 +30,7 @@ ALL_SAMPLES = list(METADATA.index)
 
 rule all:
     input:
-        'out/raw/multiqc'
+        'out/raw/multiqc', 'cutadapt_multiQC', 'sickle_multiQC'
 
 ################################
 rule all_raw_data_links:
