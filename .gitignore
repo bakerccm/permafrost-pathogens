@@ -1,6 +1,6 @@
 # ignore input and output data
 # note trailing /* is required for use with !.gitkeep
-/data/*.fastq.gz
+/data/*
 /out/*
 
 # ignore snakemake working files
