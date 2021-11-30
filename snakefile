@@ -95,13 +95,16 @@ rule all_cutadapt:
     input:
         expand('out/cutadapt/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'})
 
+# consider migrating to cutadapt wrapper:
+# https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/cutadapt/pe.html
 rule cutadapt:
     input:
         read1 = 'data/links/{sample}_R1.fastq.gz',
         read2 = 'data/links/{sample}_R2.fastq.gz'
     output:
         read1 = 'out/cutadapt/{sample}_R1.fastq.gz',
-        read2 = 'out/cutadapt/{sample}_R2.fastq.gz'
+        read2 = 'out/cutadapt/{sample}_R2.fastq.gz',
+        qc = 'out/cutadapt/{sample}.qc.txt'
     log:
         'out/cutadapt/{sample}.log'
     params:
@@ -115,7 +118,7 @@ rule cutadapt:
         '''
         cutadapt -a {params.adapter_fwd} -A {params.adapter_rev} \
         -j {threads} -m {params.min_length} \
-        -o {output.read1} -p {output.read2} {input.read1} {input.read2} 2>{log}
+        -o {output.read1} -p {output.read2} {input.read1} {input.read2} > {output.qc} {log}
         '''
 
 ################################
