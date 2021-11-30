@@ -115,7 +115,7 @@ rule cutadapt:
         '''
         cutadapt -a {params.adapter_fwd} -A {params.adapter_rev} \
         -j {threads} -m {params.min_length} \
-        -o {output.read1} -p {output.read2} {input.read1} {input.read2} >{log}
+        -o {output.read1} -p {output.read2} {input.read1} {input.read2} 2>{log}
         '''
 
 ################################
