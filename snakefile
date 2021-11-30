@@ -78,15 +78,16 @@ rule raw_multiQC:
         # featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
         # htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
     output:
-        directory('out/raw')
+        'out/raw/multiqc_report.html'
     params:
         inputdir = 'out/raw'
+        outputdir = 'out/raw'
     log:
         'out/raw/multiqc_report.log'
     conda:
         'envs/multiqc.yaml'
     shell:
-        'multiqc -o {output} {params.inputdir} 2>{log}'
+        'multiqc -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
 # remove sequencing adaptors
