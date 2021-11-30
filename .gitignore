@@ -8,6 +8,10 @@
 /snakemake.err
 /snakemake.out
 
+# ignore slurm files
+/slurm/*
+!/slurm/.gitkeep
+
 # ignore resources directory
 /resources
 !/resources/useful_commands.txt # except this file inherited from template
