@@ -30,7 +30,7 @@ ALL_SAMPLES = list(METADATA.index)
 
 rule all:
     input:
-        'out/raw/multiqc', 'cutadapt_multiQC', 'sickle_multiQC'
+        'raw_multiQC', 'cutadapt_multiQC', 'sickle_multiQC'
 
 ################################
 rule all_raw_data_links:
@@ -74,9 +74,6 @@ rule raw_fastqc:
 rule raw_multiQC:
     input:
         fastqc = expand('out/raw/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
-        # star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
-        # featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
-        # htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
     output:
         'out/raw/multiqc_report.html'
     params:
@@ -90,7 +87,7 @@ rule raw_multiQC:
         'multiqc -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
-# remove sequencing adaptors
+## use cutadapt to remove sequencing adaptors
 
 rule all_cutadapt:
     input:
@@ -120,38 +117,34 @@ rule cutadapt:
         -o {output.read1} -p {output.read2} {input.read1} {input.read2} >{output.qc}
         '''
 
-################################
-
 rule cutadapt_fastqc:
     input:
         'out/cutadapt/{sample}_{read}.fastq.gz'
     output:
-        'out/cutadapt/fastqc/{sample}_{read}_fastqc.html',
-        'out/cutadapt/fastqc/{sample}_{read}_fastqc.zip'
+        'out/cutadapt/{sample}_{read}_fastqc.html',
+        'out/cutadapt/{sample}_{read}_fastqc.zip'
     conda:
         'envs/fastqc.yaml'
     shell:
-        'fastqc -o out/cutadapt/fastqc {input}'
+        'fastqc -o out/cutadapt {input}'
 
 rule cutadapt_multiQC:
     input:
         fastqc = expand('out/cutadapt/fastqc/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
-        # star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
-        # featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
-        # htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
     output:
-        directory('out/cutadapt/multiqc')
+        'out/raw/multiqc_report.html'
     params:
-        inputdir = 'out/cutadapt/fastqc'
+        inputdir = 'out/cutadapt',
+        outputdir = 'out/cutadapt'
     log:
-        'out/cutadapt/multiqc/multiqc_report.log'
+        'out/cutadapt/multiqc_report.log'
     conda:
         'envs/multiqc.yaml'
     shell:
-        'multiqc -o {output} {params.inputdir} 2>{log}'
+        'multiqc -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
-## trim reads using sickle
+## use sickle to trim and filter reads
 
 # consider migrating to sickle wrapper:
 # https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/sickle/pe.html
@@ -209,7 +202,7 @@ rule sickle_multiQC:
         'multiqc -o {output} {params.inputdir} 2>{log}'
 
 ################################
-## merge reads using fastq-join in ea-utils
+## use fastq-join from ea-utils to merge paired end reads
 # see https://github.com/ExpressionAnalysis/ea-utils/blob/wiki/FastqJoin.md
 
 rule fastq_join:
