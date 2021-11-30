@@ -171,6 +171,7 @@ rule sickle:
         '''
         sickle pe \
             -f {input.read1} -r {input.read2} \
+            -t sanger -g \
             -o {output.read1} -p {output.read2} -s {output.unpaired} \
             -q {params.quality_threshold} -l {params.length_threshold}
         '''
