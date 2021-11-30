@@ -205,3 +205,27 @@ rule sickle_multiQC:
         'multiqc -o {output} {params.inputdir} 2>{log}'
 
 ################################
+## merge reads using fastq-join in ea-utils
+# see https://github.com/ExpressionAnalysis/ea-utils/blob/wiki/FastqJoin.md
+
+rule fastq-join:
+    input:
+        read1 = 'out/sickle/{sample}_R1.fastq.gz',
+        read2 = 'out/sickle/{sample}_R2.fastq.gz'
+    output:
+        join = 'out/fastq-join/{sample}_join.fastq.gz',
+        unmatched1 = 'out/fastq-join/{sample}_un1.fastq.gz',
+        unmatched2 = 'out/fastq-join/{sample}_un2.fastq.gz'
+    params:
+        max_percent_difference = config['fastq-join']['max_percent_difference'],
+        min_overlap = config['fastq-join']['min_overlap']
+    conda:
+        'envs/ea-utils.yaml'
+    shell:
+        '''
+        fastq-join -p {params.max_percent_difference} -m {params.min_overlap} \
+        {input.read1} {input.read2} \
+        -o {output.join} {output.unmatched1} {output.unmatched2}
+        '''
+
+################################

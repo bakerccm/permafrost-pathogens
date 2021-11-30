@@ -1,0 +1,7 @@
+name: ea-utils
+channels:
+ - bioconda
+ - conda-forge
+ - defaults
+dependencies:
+ - ea-utils
