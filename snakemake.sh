@@ -2,7 +2,7 @@
 #SBATCH -N 1  # nodes
 #SBATCH -n 56  # cores
 #SBATCH -t 0-03:00  # runtime in D-HH:MM
-#SBATCH -p development  # partition to submit to
+#SBATCH -p small  # partition to submit to
 #SBATCH --mem-per-cpu=2G  # memory per CPU (see also --mem)
 #SBATCH -J snakemake
 #SBATCH -o slurm/snakemake.out
