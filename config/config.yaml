@@ -9,3 +9,7 @@ cutadapt:
     adapter_fwd: 'CTGTCTCTTATACACATCT'
     adapter_rev: 'CTGTCTCTTATACACATCT'
     min_length: 50
+
+sickle:
+    quality_threshold: 20
+    length_threshold: 20
