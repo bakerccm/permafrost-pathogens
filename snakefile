@@ -213,7 +213,7 @@ rule sickle_multiQC:
 ## merge reads using fastq-join in ea-utils
 # see https://github.com/ExpressionAnalysis/ea-utils/blob/wiki/FastqJoin.md
 
-rule fastq-join:
+rule fastq_join:
     input:
         read1 = 'out/sickle/{sample}_R1.fastq.gz',
         read2 = 'out/sickle/{sample}_R2.fastq.gz'
