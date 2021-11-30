@@ -132,7 +132,7 @@ rule cutadapt_multiQC:
     input:
         fastqc = expand('out/cutadapt/fastqc/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
     output:
-        'out/raw/multiqc_report.html'
+        'out/cutadapt/multiqc_report.html'
     params:
         inputdir = 'out/cutadapt',
         outputdir = 'out/cutadapt'
