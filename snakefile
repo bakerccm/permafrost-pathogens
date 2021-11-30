@@ -226,4 +226,30 @@ rule fastq_join:
         -o {output.join} {output.unmatched1} {output.unmatched2}
         '''
 
+rule fastq_join_fastqc:
+    input:
+        'out/fastq-join/{sample}_{read}.fastq.gz'
+    output:
+        'out/fastq-join/{sample}_{read}_fastqc.html',
+        'out/fastq-join/{sample}_{read}_fastqc.zip'
+    conda:
+        'envs/fastqc.yaml'
+    shell:
+        'fastqc -o out/fastq-join {input}'
+
+rule fastq_join_multiQC:
+    input:
+        fastqc = expand('out/fastq-join/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+    output:
+        'out/fastq-join/multiqc_report.html'
+    params:
+        inputdir = 'out/fastq-join',
+        outputdir = 'out/fastq-join'
+    log:
+        'out/fastq-join/multiqc_report.log'
+    conda:
+        'envs/multiqc.yaml'
+    shell:
+        'multiqc -o {params.outputdir} {params.inputdir} 2>{log}'
+
 ################################
