@@ -154,6 +154,8 @@ rule cutadapt_multiQC:
 ################################
 ## trim reads using sickle
 
+# consider migrating to sickle wrapper:
+# https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/sickle/pe.html
 rule sickle:
     input:
         read1 = 'out/cutadapt/{sample}_R1.fastq.gz',
