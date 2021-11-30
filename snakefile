@@ -68,7 +68,7 @@ rule raw_fastqc:
     conda:
         'envs/fastqc.yaml'
     shell:
-        'fastqc -o out/raw/fastqc {input}'
+        'fastqc -o out/raw {input}'
 
 # use multiQC to summarize fastqc results
 rule raw_multiQC:
