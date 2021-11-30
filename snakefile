@@ -80,7 +80,7 @@ rule raw_multiQC:
     output:
         'out/raw/multiqc_report.html'
     params:
-        inputdir = 'out/raw'
+        inputdir = 'out/raw',
         outputdir = 'out/raw'
     log:
         'out/raw/multiqc_report.log'
