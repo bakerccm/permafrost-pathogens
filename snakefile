@@ -22,19 +22,13 @@ wildcard_constraints:
 ## get sample and reference genome metadata
 
 import pandas as pd
-import re
-import os
 METADATA = pd.read_csv(METADATA_FILE, sep = '\t', index_col = 'sample')
 ALL_SAMPLES = list(METADATA.index)
-
-# this is not a very clean way to do this:
-#READ1_FILES = [re.sub(".fastq.gz", "", os.path.basename(file)) for file in METADATA['read1']]
-#READ2_FILES = [re.sub(".fastq.gz", "", os.path.basename(file)) for file in METADATA['read2']]
 
 ################################
 # default rules
 
-# rule all:
+rule all:
     input:
         'out/raw/multiqc'
 
@@ -82,16 +76,18 @@ rule run_fastqc:
 rule multiQC:
     input:
         fastqc = expand('out/raw/fastqc/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
-        #star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
-        #featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
-        #htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
+        # star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
+        # featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
+        # htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
     output:
         directory('out/raw/multiqc')
+    params:
+        inputdir = 'out/raw/fastqc'
     log:
         'out/raw/multiqc/multiqc_report.log'
     conda:
         'envs/multiqc.yaml'
     shell:
-        'multiqc -o {output} {input} 2>{log}'
+        'multiqc -o {output} {params.inputdir} 2>{log}'
 
 ################################
