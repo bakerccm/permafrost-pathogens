@@ -1,24 +1,20 @@
 #!/bin/bash
-#SBATCH -N 1    # nodes
-#SBATCH -n 8    # cores
-#SBATCH --mem=64G    # memory per node
-##SBATCH --mem-per-cpu=6G    # memory per cpu
-#SBATCH -p priority    # partition
-#SBATCH -t 1-00:00    # runtime d-hh:mm
-#SBATCH -o snakemake.out
-#SBATCH -e snakemake.err
-#SBATCH --mail-user=xxxxxxxx@xxxxx.com
-#SBATCH --mail-type=END
-##SBATCH --dependency=afterOK:9999999
+#SBATCH -N 1  # nodes
+#SBATCH -n 56  # cores
+#SBATCH -t 0-03:00  # runtime in D-HH:MM
+#SBATCH -p development  # partition to submit to
+#SBATCH --mem-per-cpu=2G  # memory per CPU (see also --mem)
+#SBATCH -J snakemake
+#SBATCH -o slurm/snakemake.out
+#SBATCH -e slurm/snakemake.err
+##SBATCH --mail-type=BEGIN,END    # notifications: BEGIN,END,FAIL,ALL
+##SBATCH --mail-user=
 
-# module load snakemake/3.12.0
+# use snakemake conda environment with snakemake 6.4.1 installed
+# note use of conda activate (preferred over source activate from conda v4.4 onwards)
+conda activate snakemake
 
-# use snakemake environment with snakemake 5.10.0 installed (env modules on cluster only have snakemake/3.12.0)
-# note use of source activate (conda activate became preferred from conda v4.4)
-module load conda2/4.2.13
-source activate snakemake
-
-snakemake --use-conda -j 8 some_rule
+snakemake -j 56 --use-conda sickle_multiQC fastq_join_multiQC
 
 # snakemake -j 8 --use-conda some_rule --forcerun upstream_rule
 
