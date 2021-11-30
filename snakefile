@@ -53,11 +53,11 @@ rule raw_data_link:
 ################################
 # generate fastqc quality reports for each fastq.gz file
 
-rule all_run_fastqc:
+rule all_raw_fastqc:
     input:
         expand('out/raw/fastqc/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
 
-rule run_fastqc:
+rule raw_fastqc:
     input:
         'data/links/{sample}_{read}.fastq.gz'
     output:
@@ -70,7 +70,7 @@ rule run_fastqc:
 
 ################################
 # use multiQC to summarize fastqc results
-rule multiQC:
+rule raw_multiQC:
     input:
         fastqc = expand('out/raw/fastqc/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
         # star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
@@ -113,5 +113,32 @@ rule cutadapt:
 # -n 2 -m {params.min_length}
 ################################
 
+rule cutadapt_fastqc:
+    input:
+        'out/cutadapt/{sample}_{read}.fastq.gz'
+    output:
+        'out/cutadapt/fastqc/{sample}_{read}_fastqc.html',
+        'out/cutadapt/fastqc/{sample}_{read}_fastqc.zip'
+    conda:
+        'envs/fastqc.yaml'
+    shell:
+        'fastqc -o out/cutadapt/fastqc {input}'
+
+rule cutadapt_multiQC:
+    input:
+        fastqc = expand('out/cutadapt/fastqc/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+        # star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
+        # featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
+        # htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
+    output:
+        directory('out/cutadapt/multiqc')
+    params:
+        inputdir = 'out/cutadapt/fastqc'
+    log:
+        'out/cutadapt/multiqc/multiqc_report.log'
+    conda:
+        'envs/multiqc.yaml'
+    shell:
+        'multiqc -o {output} {params.inputdir} 2>{log}'
 
 ################################
