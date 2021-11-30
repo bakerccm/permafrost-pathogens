@@ -63,8 +63,8 @@ rule raw_fastqc:
     input:
         'data/links/{sample}_{read}.fastq.gz'
     output:
-        'out/raw/fastqc/{sample}_{read}_fastqc.html',
-        'out/raw/fastqc/{sample}_{read}_fastqc.zip'
+        'out/raw/{sample}_{read}_fastqc.html',
+        'out/raw/{sample}_{read}_fastqc.zip'
     conda:
         'envs/fastqc.yaml'
     shell:
@@ -78,11 +78,11 @@ rule raw_multiQC:
         # featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
         # htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
     output:
-        directory('out/raw/multiqc')
+        directory('out/raw')
     params:
-        inputdir = 'out/raw/fastqc'
+        inputdir = 'out/raw'
     log:
-        'out/raw/multiqc/multiqc_report.log'
+        'out/raw/multiqc_report.log'
     conda:
         'envs/multiqc.yaml'
     shell:
