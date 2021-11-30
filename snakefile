@@ -165,7 +165,7 @@ rule sickle:
         quality_threshold = config['sickle']['quality_threshold'],
         length_threshold = config['sickle']['length_threshold']
     conda:
-        'envs/sickle-0.7.0.yaml'
+        'envs/sickle.yaml'
     threads: 4
     shell:
         '''
