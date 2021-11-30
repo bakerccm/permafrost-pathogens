@@ -105,8 +105,6 @@ rule cutadapt:
         read1 = 'out/cutadapt/{sample}_R1.fastq.gz',
         read2 = 'out/cutadapt/{sample}_R2.fastq.gz',
         qc = 'out/cutadapt/{sample}.qc.txt'
-    log:
-        'out/cutadapt/{sample}.log'
     params:
         adapter_fwd = config['cutadapt']['adapter_fwd'],
         adapter_rev = config['cutadapt']['adapter_rev'],
@@ -118,7 +116,7 @@ rule cutadapt:
         '''
         cutadapt -a {params.adapter_fwd} -A {params.adapter_rev} \
         -j {threads} -m {params.min_length} \
-        -o {output.read1} -p {output.read2} {input.read1} {input.read2} >{output.qc} 2>{log}
+        -o {output.read1} -p {output.read2} {input.read1} {input.read2} >{output.qc}
         '''
 
 ################################
