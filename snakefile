@@ -157,8 +157,8 @@ rule sickle:
         read1 = 'out/sickle/{sample}_R1.fastq.gz',
         read2 = 'out/sickle/{sample}_R2.fastq.gz',
         unpaired = 'out/sickle/{sample}_unpaired.fastq.gz'
-    # log:
-    #     'out/sickle/{sample}.log'
+    log:
+        'out/sickle/{sample}_sickle.log'
     params:
         quality_threshold = config['sickle']['quality_threshold'],
         length_threshold = config['sickle']['length_threshold']
@@ -171,7 +171,8 @@ rule sickle:
             -f {input.read1} -r {input.read2} \
             -t sanger -g \
             -o {output.read1} -p {output.read2} -s {output.unpaired} \
-            -q {params.quality_threshold} -l {params.length_threshold}
+            -q {params.quality_threshold} -l {params.length_threshold} \
+            2> {log}
         '''
 
 rule sickle_fastqc:
@@ -187,20 +188,19 @@ rule sickle_fastqc:
 
 rule sickle_multiQC:
     input:
-        fastqc = expand('out/sickle/fastqc/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
-        # star = expand('out/alignment/{sample}_Log.final.out', sample = list(SAMPLES.index)), # .Log.final.out files from STAR alignment
-        # featureCounts = 'out/featureCounts/bulkseq_featureCounts.txt.summary', # .summary file from featureCounts
-        # htseq_count = expand('out/htseq_count/{sample}.txt', sample = list(SAMPLES.index)) # .txt files from htseq-count
+        fastqc = expand('out/sickle/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'}),
+        sickle = expand("out/sickle/{sample}_sickle.log", sample = ALL_SAMPLES)
     output:
-        directory('out/sickle/multiqc')
+        'out/sickle/multiqc_report.html'
     params:
-        inputdir = 'out/sickle/fastqc'
+        inputdir = 'out/sickle',
+        outputdir = 'out/sickle'
     log:
-        'out/sickle/multiqc/multiqc_report.log'
+        'out/sickle/multiqc_report.log'
     conda:
         'envs/multiqc.yaml'
     shell:
-        'multiqc -o {output} {params.inputdir} 2>{log}'
+        'multiqc -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
 ## use fastq-join from ea-utils to merge paired end reads
