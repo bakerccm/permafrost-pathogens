@@ -12,7 +12,7 @@ cutadapt:
 
 sickle:
     quality_threshold: 20
-    length_threshold: 20
+    length_threshold: 50
 
 fastq-join:
     max_percent_difference: 8 # default: 8
