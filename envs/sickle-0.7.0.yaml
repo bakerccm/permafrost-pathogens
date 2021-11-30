@@ -1,0 +1,7 @@
+name: sickle-0.7.0
+channels:
+ - bioconda
+ - conda-forge
+ - defaults
+dependencies:
+ - sickle=0.7.0
