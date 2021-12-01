@@ -223,7 +223,7 @@ rule fastq_join:
         '''
         fastq-join -p {params.max_percent_difference} -m {params.min_overlap} \
         {input.read1} {input.read2} \
-        -o {output.join} {output.unmatched1} {output.unmatched2}
+        -o {output.unmatched1} -o {output.unmatched2} -o {output.join}
         '''
 
 rule fastq_join_fastqc:
