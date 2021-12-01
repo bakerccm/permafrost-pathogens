@@ -5,9 +5,9 @@ raw_data_dir:
     '/work/08186/cbaker/frontera/permafrost-pathogens-data'
 
 cutadapt:
-    # both adapter directions are the same
-    adapter_fwd: 'CTGTCTCTTATACACATCT'
-    adapter_rev: 'CTGTCTCTTATACACATCT'
+    # TruSeq adapters
+    adapter_fwd: 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'
+    adapter_rev: 'AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT'
     min_length: 50
 
 sickle:
