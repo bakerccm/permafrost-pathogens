@@ -119,27 +119,27 @@ rule cutadapt:
         '''
 
 
-rule trimmomatic:
-    input:
-        read1 = 'data/links/{sample}_R1.fastq.gz',
-        read2 = 'data/links/{sample}_R2.fastq.gz'
-    output:
-        read1 = 'out/trimmomatic/{sample}_R1.fastq.gz',
-        read2 = 'out/trimmomatic/{sample}_R2.fastq.gz',
-        qc = 'out/cutadapt/{sample}.qc.txt'
-    params:
-        adapter_fwd = config['cutadapt']['adapter_fwd'],
-        adapter_rev = config['cutadapt']['adapter_rev'],
-        min_length = config['cutadapt']['min_length']
-    conda:
-        'envs/trimmomatic.yaml'
-    threads: 4
-    shell:
-        '''
-        cutadapt -a {params.adapter_fwd} -A {params.adapter_rev} \
-        -j {threads} -m {params.min_length} \
-        -o {output.read1} -p {output.read2} {input.read1} {input.read2} >{output.qc}
-        '''
+# rule trimmomatic:
+#     input:
+#         read1 = 'data/links/{sample}_R1.fastq.gz',
+#         read2 = 'data/links/{sample}_R2.fastq.gz'
+#     output:
+#         read1 = 'out/trimmomatic/{sample}_R1.fastq.gz',
+#         read2 = 'out/trimmomatic/{sample}_R2.fastq.gz',
+#         qc = 'out/cutadapt/{sample}.qc.txt'
+#     params:
+#         adapter_fwd = config['cutadapt']['adapter_fwd'],
+#         adapter_rev = config['cutadapt']['adapter_rev'],
+#         min_length = config['cutadapt']['min_length']
+#     conda:
+#         'envs/trimmomatic.yaml'
+#     threads: 4
+#     shell:
+#         '''
+#         cutadapt -a {params.adapter_fwd} -A {params.adapter_rev} \
+#         -j {threads} -m {params.min_length} \
+#         -o {output.read1} -p {output.read2} {input.read1} {input.read2} >{output.qc}
+#         '''
 # java -jar trimmomatic-0.39.jar PE input_forward.fq.gz input_reverse.fq.gz output_forward_paired.fq.gz output_forward_unpaired.fq.gz output_reverse_paired.fq.gz output_reverse_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10:2:keepBothReads LEADING:3 TRAILING:3 MINLEN:36
 
 #trimmomatic PE {input.read1} {input.read2} \
