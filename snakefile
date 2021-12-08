@@ -106,6 +106,7 @@ rule cutadapt:
     params:
         adapter_fwd = config['cutadapt']['adapter_fwd'],
         adapter_rev = config['cutadapt']['adapter_rev'],
+        max_error_rate = config['cutadapt']['max_error_rate'],
         min_length = config['cutadapt']['min_length']
     conda:
         'envs/cutadapt-3.5.yaml'
@@ -113,9 +114,44 @@ rule cutadapt:
     shell:
         '''
         cutadapt -a {params.adapter_fwd} -A {params.adapter_rev} \
+        -j {threads} -e {params.max_error_rate} -m {params.min_length} \
+        -o {output.read1} -p {output.read2} {input.read1} {input.read2} >{output.qc}
+        '''
+
+
+rule trimmomatic:
+    input:
+        read1 = 'data/links/{sample}_R1.fastq.gz',
+        read2 = 'data/links/{sample}_R2.fastq.gz'
+    output:
+        read1 = 'out/trimmomatic/{sample}_R1.fastq.gz',
+        read2 = 'out/trimmomatic/{sample}_R2.fastq.gz',
+        qc = 'out/cutadapt/{sample}.qc.txt'
+    params:
+        adapter_fwd = config['cutadapt']['adapter_fwd'],
+        adapter_rev = config['cutadapt']['adapter_rev'],
+        min_length = config['cutadapt']['min_length']
+    conda:
+        'envs/trimmomatic.yaml'
+    threads: 4
+    shell:
+        '''
+        cutadapt -a {params.adapter_fwd} -A {params.adapter_rev} \
         -j {threads} -m {params.min_length} \
         -o {output.read1} -p {output.read2} {input.read1} {input.read2} >{output.qc}
         '''
+# java -jar trimmomatic-0.39.jar PE input_forward.fq.gz input_reverse.fq.gz output_forward_paired.fq.gz output_forward_unpaired.fq.gz output_reverse_paired.fq.gz output_reverse_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10:2:keepBothReads LEADING:3 TRAILING:3 MINLEN:36
+
+trimmomatic PE {input.read1} {input.read2} \
+{output.read1_paired} {output.read1_unpaired} {output.read2_paired} {output.read2_unpaired} \
+ILLUMINACLIP:TruSeq3-PE.fa:2:30:10:2:keepBothReads LEADING:3 TRAILING:3 MINLEN:50
+
+
+trimmomatic PE data/links/CTRL-R2_R1.fastq.gz data/links/CTRL-R2_R2.fastq.gz \
+out/trimmomatic/CTRL-R2_R1_paired.fastq.gz out/trimmomatic/CTRL-R2_R1_unpaired.fastq.gz out/trimmomatic/CTRL-R2_R2_paired.fastq.gz out/trimmomatic/CTRL-R2_R2_unpaired.fastq.gz \
+ILLUMINACLIP:TruSeq3-PE.fa:2:30:10:2:keepBothReads LEADING:3 TRAILING:3 MINLEN:50
+
+
 
 rule cutadapt_fastqc:
     input:
