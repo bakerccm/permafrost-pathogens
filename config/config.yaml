@@ -8,6 +8,7 @@ cutadapt:
     # TruSeq adapters
     adapter_fwd: 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'
     adapter_rev: 'AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT'
+    max_error_rate: 0.2
     min_length: 50
 
 sickle:
