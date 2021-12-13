@@ -160,7 +160,7 @@ rule bbduk:
         k = config['bbduk']['k'],
         mink = config['bbduk']['mink'],
         hdist = config['bbduk']['hdist'],
-        trim_params = config['bbduk']['trim-params'],
+        trim_params = config['bbduk']['trim_params'],
         qtrim = config['bbduk']['qtrim'],
         trimq = config['bbduk']['trimq'],
         minlength = config['bbduk']['minlength']
