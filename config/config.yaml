@@ -13,10 +13,16 @@ cutadapt:
     max_error_rate: 0.1
     minimum_length: 50
 
+# see https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/ for guidance
 bbduk:
-    ktrim: 'r'
-    qtrim: 'r'
-    trimq: 10
+    ref: 'config/adapters.fa' # path to copy of file from BBTools, as file is found with conda install
+    ktrim: 'r' # trim adapters from 3' end only
+    k: 20 # should be less than length of adapters
+    mink: 8 # min kmer length towards ends
+    hdist: 1 # hamming distance 1 allows up to 1 mismatch
+    trim_params: 'tbo' # trim adapters based on pair overlap detection using BBMerge
+    qtrim: 'r' # quality trim at 3' end only
+    trimq: 10 # quality trim to Phred score 10
     minlength: 50
 
 sickle:

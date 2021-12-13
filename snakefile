@@ -150,12 +150,19 @@ rule cutadapt_multiQC:
 rule bbduk:
     input:
         read1 = 'data/links/{sample}_R1.fastq.gz',
-        read2 = 'data/links/{sample}_R2.fastq.gz'
+        read2 = 'data/links/{sample}_R2.fastq.gz',
+        # This is a copy of the adapters.fa file supplied with BBTools because bbduk does not pick it up properly from the conda installation
+        adapters = 'config/adapters.fa'
     output:
         read1 = 'out/bbduk/{sample}_R1.fastq.gz',
         read2 = 'out/bbduk/{sample}_R2.fastq.gz'
     params:
+        ref = config['bbduk']['ref'],
         ktrim = config['bbduk']['ktrim'],
+        k = config['bbduk']['k'],
+        mink = config['bbduk']['mink'],
+        hdist = config['bbduk']['hdist'],
+        trim_params = config['bbduk']['trim-params'],
         qtrim = config['bbduk']['qtrim'],
         trimq = config['bbduk']['trimq'],
         minlength = config['bbduk']['minlength']
@@ -166,7 +173,8 @@ rule bbduk:
     shell:
         '''
         bbduk.sh in1={input.read1} in2={input.read2} out1={output.read1} out2={output.read2} \
-        ktrim={params.ktrim} qtrim={params.qtrim} trimq={params.trimq} minlength={params.minlength} \
+        ref={input.adapters} ktrim={params.ktrim} k={params.k} {params.trim_params} \
+        qtrim={params.qtrim} trimq={params.trimq} minlength={params.minlength} \
         &>>{log}
         '''
 
