@@ -13,6 +13,12 @@ cutadapt:
     max_error_rate: 0.1
     minimum_length: 50
 
+bbduk:
+    ktrim = 'r'
+    qtrim = 'r'
+    trimq = 10
+    minlength = 50
+
 sickle:
     quality_threshold: 20
     length_threshold: 50

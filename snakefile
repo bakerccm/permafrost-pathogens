@@ -147,6 +147,56 @@ rule cutadapt_multiQC:
         'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
+rule bbduk:
+    input:
+        read1 = 'data/links/{sample}_R1.fastq.gz',
+        read2 = 'data/links/{sample}_R2.fastq.gz'
+    output:
+        read1 = 'out/bbduk/{sample}_R1.fastq.gz',
+        read2 = 'out/bbduk/{sample}_R2.fastq.gz'
+    params:
+        ktrim = config['bbduk']['ktrim'],
+        qtrim = config['bbduk']['qtrim'],
+        trimq = config['bbduk']['trimq'],
+        minlength = config['bbduk']['minlength']
+    log:
+        'out/bbduk/{sample}.log'
+    conda:
+        'envs/bbtools.yaml'
+    shell:
+        '''
+        bbduk.sh in1={input.read1} in2={input.read2} out1={output.read1} out2={output.read2} \
+        ktrim={params.ktrim} qtrim={params.qtrim} trimq={params.trimq} minlength={params.minlength} \
+        &>>{log}
+        '''
+
+rule bbduk_fastqc:
+    input:
+        'out/bbduk/{sample}_{read}.fastq.gz'
+    output:
+        'out/bbduk/{sample}_{read}_fastqc.html',
+        'out/bbduk/{sample}_{read}_fastqc.zip'
+    conda:
+        'envs/fastqc.yaml'
+    shell:
+        'fastqc -o out/bbduk {input}'
+
+rule bbduk_multiQC:
+    input:
+        fastqc = expand('out/bbduk/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+    output:
+        'out/bbduk/multiqc_report.html'
+    params:
+        inputdir = 'out/bbduk',
+        outputdir = 'out/bbduk'
+    log:
+        'out/bbduk/multiqc_report.log'
+    conda:
+        'envs/multiqc.yaml'
+    shell:
+        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
+
+################################
 ## use sickle to trim and filter reads
 
 # consider migrating to sickle wrapper:
