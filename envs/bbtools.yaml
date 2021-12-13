@@ -1,0 +1,5 @@
+name: bbtools
+channels:
+ - agbiome
+dependencies:
+ - bbtools
