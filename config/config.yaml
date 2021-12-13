@@ -14,10 +14,10 @@ cutadapt:
     minimum_length: 50
 
 bbduk:
-    ktrim = 'r'
-    qtrim = 'r'
-    trimq = 10
-    minlength = 50
+    ktrim: 'r'
+    qtrim: 'r'
+    trimq: 10
+    minlength: 50
 
 sickle:
     quality_threshold: 20
