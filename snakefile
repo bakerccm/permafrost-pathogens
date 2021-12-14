@@ -155,6 +155,7 @@ rule bbduk:
         read1 = 'out/bbduk/{sample}_R1.fastq.gz',
         read2 = 'out/bbduk/{sample}_R2.fastq.gz'
     params:
+        memory = config['bbduk']['memory'],
         ref = config['bbduk']['ref'],
         ktrim = config['bbduk']['ktrim'],
         k = config['bbduk']['k'],
@@ -170,7 +171,7 @@ rule bbduk:
         'envs/bbtools.yaml'
     shell:
         '''
-        bbduk.sh -Xmx3g in1={input.read1} in2={input.read2} out1={output.read1} out2={output.read2} \
+        bbduk.sh {params.memory} in1={input.read1} in2={input.read2} out1={output.read1} out2={output.read2} \
         ref={params.ref} ktrim={params.ktrim} k={params.k} {params.trim_params} \
         qtrim={params.qtrim} trimq={params.trimq} minlength={params.minlength} \
         &>>{log}
