@@ -168,12 +168,9 @@ rule bbduk:
         'out/bbduk/{sample}.log'
     conda:
         'envs/bbtools.yaml'
-    resources:
-        #-Xmx3g
-        mem_mb = 3000
     shell:
         '''
-        bbduk.sh in1={input.read1} in2={input.read2} out1={output.read1} out2={output.read2} \
+        bbduk.sh -Xmx3g in1={input.read1} in2={input.read2} out1={output.read1} out2={output.read2} \
         ref={params.ref} ktrim={params.ktrim} k={params.k} {params.trim_params} \
         qtrim={params.qtrim} trimq={params.trimq} minlength={params.minlength} \
         &>>{log}
