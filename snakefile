@@ -168,6 +168,9 @@ rule bbduk:
         'out/bbduk/{sample}.log'
     conda:
         'envs/bbtools.yaml'
+    resources:
+        #-Xmx3g
+        mem_mb = 3000
     shell:
         '''
         bbduk.sh in1={input.read1} in2={input.read2} out1={output.read1} out2={output.read2} \
