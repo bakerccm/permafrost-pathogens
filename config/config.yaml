@@ -15,7 +15,7 @@ cutadapt:
 
 # see https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/ for guidance
 bbduk:
-    memory: '-Xmx3g' # restrict memory usage to 6GB (Frontera nodes have 192GB, so can run 56 jobs)
+    memory: '-Xmx3g' # restrict memory usage to 3GB (Frontera nodes have 192GB)
     ref: 'config/adapters.fa' # path to copy of file from BBTools, as file is found with conda install
     ktrim: 'r' # trim adapters from 3' end only
     k: 20 # should be less than length of adapters
