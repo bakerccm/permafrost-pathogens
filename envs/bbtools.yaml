@@ -1,5 +1,6 @@
 name: bbtools
 channels:
  - agbiome
+ - bioconda
 dependencies:
  - bbtools
