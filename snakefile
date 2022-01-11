@@ -267,8 +267,8 @@ rule sickle_multiQC:
 
 rule fastq_join:
     input:
-        read1 = 'out/sickle/{sample}_R1.fastq.gz',
-        read2 = 'out/sickle/{sample}_R2.fastq.gz'
+        read1 = 'out/bbduk/{sample}_R1.fastq.gz',
+        read2 = 'out/bbduk/{sample}_R2.fastq.gz'
     output:
         join = 'out/fastq-join/{sample}_join.fastq.gz',
         unmatched1 = 'out/fastq-join/{sample}_un1.fastq.gz',
