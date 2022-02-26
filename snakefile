@@ -312,3 +312,41 @@ rule fastq_join_multiQC:
         'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
+# megahit assembly
+
+rule megahit:
+    input:
+        read1 = "out/bbduk/35m-t0-R1_R1.fastq.gz","out/bbduk/35m-t0-R2_R1_fastq.gz",
+        read2 = "out/bbduk/35m-t0-R1_R2.fastq.gz","out/bbduk/35m-t0-R2_R2_fastq.gz"
+    output:
+        directory("out/megahit")
+    threads: 16
+    conda:
+        'envs/megahit.yaml'
+    shell:
+        'megahit -1 {input.read1} -2 {input.read2} -t {threads} -o {output}'
+
+################################
+# metaspades assembly
+
+rule metaspades:
+    input:
+        # may need to use yamle file or some other approach if co-assmblying many files
+        pe1_1 = "out/bbduk/35m-t0-R1_R1.fastq.gz", # library 1, read 1
+        pe1_2 = "out/bbduk/35m-t0-R1_R2.fastq.gz", # library 1, read 2
+        pe2_1 = "out/bbduk/35m-t0-R2_R1_fastq.gz", # library 1, read 1
+        pe2_2 = "out/bbduk/35m-t0-R2_R2_fastq.gz"  # library 2, read 2
+    output:
+        directory("out/metaspades")
+    threads: 16
+    conda:
+        'envs/spades.yaml'
+    shell:
+        '''
+        metaspades.py -t {threads} \
+        --pe1-1 {input.pe1_1} --pe1-2 {input.pe1_2} \
+        --pe2-1 {input.pe1_1} --pe2-2 {input.pe1_2} \
+        -o {output}
+        '''
+
+################################
