@@ -334,8 +334,8 @@ rule metaspades:
         # may need to use yamle file or some other approach if co-assmblying many files
         pe1_1 = "out/bbduk/35m-t0-R1_R1.fastq.gz", # library 1, read 1
         pe1_2 = "out/bbduk/35m-t0-R1_R2.fastq.gz", # library 1, read 2
-        pe2_1 = "out/bbduk/35m-t0-R2_R1_fastq.gz", # library 1, read 1
-        pe2_2 = "out/bbduk/35m-t0-R2_R2_fastq.gz"  # library 2, read 2
+        pe2_1 = "out/bbduk/35m-t0-R2_R1.fastq.gz", # library 1, read 1
+        pe2_2 = "out/bbduk/35m-t0-R2_R2.fastq.gz"  # library 2, read 2
     output:
         directory("out/metaspades")
     threads: 16
