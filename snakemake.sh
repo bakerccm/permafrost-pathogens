@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH -N 1  # nodes
-#SBATCH -n 32  # cores
+#SBATCH -n 56  # cores (note TACC allocates whole nodes)
 #SBATCH -t 0-03:00  # runtime in D-HH:MM
 #SBATCH -p small  # partition to submit to
-##SBATCH --mem-per-cpu=2G  # memory per CPU (see also --mem)
+##SBATCH --mem=192G  # total mem (note TACC allocates whole nodes; using this argument causes job to fail)
 #SBATCH -J snakemake
 #SBATCH -o slurm/snakemake.out
 #SBATCH -e slurm/snakemake.err
