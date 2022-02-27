@@ -316,8 +316,8 @@ rule fastq_join_multiQC:
 
 rule megahit:
     input:
-        read1 = ["out/bbduk/35m-t0-R1_R1.fastq.gz","out/bbduk/35m-t0-R2_R1.fastq.gz"],
-        read2 = ["out/bbduk/35m-t0-R1_R2.fastq.gz","out/bbduk/35m-t0-R2_R2.fastq.gz"]
+        read1 = "out/bbduk/35m-t0-R1_R1.fastq.gz",
+        read2 = "out/bbduk/35m-t0-R1_R2.fastq.gz"
     output:
         directory("out/megahit")
     threads: 16
