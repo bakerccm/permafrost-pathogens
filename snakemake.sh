@@ -12,7 +12,9 @@
 
 # use snakemake conda environment with snakemake 6.4.1 installed
 # note use of conda activate (preferred over source activate from conda v4.4 onwards)
-conda activate snakemake
+# conda activate snakemake
+
+source activate snakemake
 
 # snakemake -j 56 --use-conda sickle_multiQC fastq_join_multiQC
 
