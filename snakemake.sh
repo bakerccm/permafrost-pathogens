@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH -N 1  # nodes
-#SBATCH -n 56  # cores
+#SBATCH -n 32  # cores
 #SBATCH -t 0-03:00  # runtime in D-HH:MM
 #SBATCH -p small  # partition to submit to
-#SBATCH --mem-per-cpu=2G  # memory per CPU (see also --mem)
+##SBATCH --mem-per-cpu=2G  # memory per CPU (see also --mem)
 #SBATCH -J snakemake
 #SBATCH -o slurm/snakemake.out
 #SBATCH -e slurm/snakemake.err
@@ -14,7 +14,9 @@
 # note use of conda activate (preferred over source activate from conda v4.4 onwards)
 conda activate snakemake
 
-snakemake -j 56 --use-conda sickle_multiQC fastq_join_multiQC
+# snakemake -j 56 --use-conda sickle_multiQC fastq_join_multiQC
+
+snakemake -j 32 --use-conda megahit metaspades
 
 # snakemake -j 8 --use-conda some_rule --forcerun upstream_rule
 
