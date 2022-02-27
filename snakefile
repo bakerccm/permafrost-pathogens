@@ -320,7 +320,7 @@ rule megahit:
         read2 = ["out/bbduk/35m-t0-R1_R2.fastq.gz","out/bbduk/35m-t0-R2_R2.fastq.gz"]
     output:
         directory("out/megahit")
-    threads: 16
+    threads: 32
     conda:
         'envs/megahit.yaml'
     shell:
