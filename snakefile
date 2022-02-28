@@ -358,8 +358,9 @@ rule metaspades:
     conda:
         'envs/spades.yaml'
     shell:
+        # note hard codes memory limit of 190Gb here (Frontera nodes have 196Gb so this should run on a single node if it's the only job running)
         '''
-        metaspades.py -t {threads} \
+        metaspades.py -t {threads} -m 190 \
         --pe1-1 {input.pe1_1} --pe1-2 {input.pe1_2} \
         --pe2-1 {input.pe2_1} --pe2-2 {input.pe2_2} \
         -o {output}
