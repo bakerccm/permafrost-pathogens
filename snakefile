@@ -354,7 +354,7 @@ rule metaspades:
         pe2_2 = "out/bbduk/35m-t0-R2_R2.fastq.gz"  # library 2, read 2
     output:
         directory("out/metaspades")
-    threads: 16
+    threads: 32
     conda:
         'envs/spades.yaml'
     shell:

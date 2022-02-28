@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -N 1  # nodes
 #SBATCH -n 56  # cores (note TACC allocates whole nodes)
-#SBATCH -t 0-03:00  # runtime in D-HH:MM
+#SBATCH -t 0-06:00  # runtime in D-HH:MM
 #SBATCH -p small  # partition to submit to
 ##SBATCH --mem=192G  # total mem (note TACC allocates whole nodes; using this argument causes job to fail)
 #SBATCH -J snakemake
@@ -18,7 +18,7 @@ source activate snakemake
 
 # snakemake -j 56 --use-conda sickle_multiQC fastq_join_multiQC
 
-snakemake -j 32 --use-conda megahit
+snakemake -j 32 --use-conda metaspades
 
 # snakemake -j 8 --use-conda some_rule --forcerun upstream_rule
 
