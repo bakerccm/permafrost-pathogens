@@ -38,7 +38,7 @@ rule all:
 ################################
 rule all_raw_data_links:
     input:
-        expand('data/raw/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'})
+        expand('data/links/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'})
 
 rule raw_data_link:
     input:
