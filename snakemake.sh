@@ -22,7 +22,7 @@ source activate snakemake
 
 # snakemake -j 56 --use-conda sickle_multiQC fastq_join_multiQC
 
-snakemake -j 32 --use-conda metaspades
+snakemake -j 56 --use-conda megahit
 
 # snakemake -j 8 --use-conda some_rule --forcerun upstream_rule
 
