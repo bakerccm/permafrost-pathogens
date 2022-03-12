@@ -9,6 +9,10 @@
 #SBATCH -e slurm/snakemake.err
 ##SBATCH --mail-type=BEGIN,END    # notifications: BEGIN,END,FAIL,ALL
 ##SBATCH --mail-user=
+##SBATCH --dependency=after:jobid[:jobid...] job can begin after specified jobs have started
+##SBATCH --dependency=afterany:jobid[:jobid...] job can begin after specified jobs have terminated
+##SBATCH --dependency=afterok:jobid[:jobid...] job can begin after specified jobs have completed with exit code zero
+##SBATCH --dependency=afternotok:jobid[:jobid...] job can begin after specified jobs have failed
 
 # use snakemake conda environment with snakemake 6.4.1 installed
 # note use of conda activate (preferred over source activate from conda v4.4 onwards)
