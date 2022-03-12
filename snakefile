@@ -33,7 +33,7 @@ ALL_SAMPLES = list(METADATA.index)
 
 rule all:
     input:
-        'out/raw/multiqc_report.html', 'out/cutadapt/multiqc_report.html', 'out/bbduk/multiqc_report.html', 'out/sickle/multiqc_report.html', 'out/fastq-join/multiqc_report.html'
+        'out/raw/multiqc_report.html', 'out/bbduk/multiqc_report.html', 'out/fastq-join/multiqc_report.html'
 
 ################################
 rule all_raw_data_links:
@@ -73,7 +73,6 @@ rule raw_fastqc:
     shell:
         'fastqc -o out/raw {input}'
 
-# use multiQC to summarize fastqc results
 rule raw_multiQC:
     input:
         fastqc = expand('out/raw/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
@@ -84,66 +83,6 @@ rule raw_multiQC:
         outputdir = 'out/raw'
     log:
         'out/raw/multiqc_report.log'
-    conda:
-        'envs/multiqc.yaml'
-    shell:
-        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
-
-################################
-## use cutadapt to remove sequencing adaptors
-
-rule all_cutadapt:
-    input:
-        expand('out/cutadapt/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'})
-
-# consider migrating to cutadapt wrapper:
-# https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/cutadapt/pe.html
-rule cutadapt:
-    input:
-        read1 = 'data/links/{sample}_R1.fastq.gz',
-        read2 = 'data/links/{sample}_R2.fastq.gz'
-    output:
-        read1 = 'out/cutadapt/{sample}_R1.fastq.gz',
-        read2 = 'out/cutadapt/{sample}_R2.fastq.gz',
-        qc = 'out/cutadapt/{sample}.qc.txt'
-    params:
-        quality_cutoff = config['cutadapt']['quality_cutoff'],
-        adapter_fwd = config['cutadapt']['adapter_fwd'],
-        adapter_rev = config['cutadapt']['adapter_rev'],
-        max_error_rate = config['cutadapt']['max_error_rate'],
-        minimum_length = config['cutadapt']['minimum_length']
-    conda:
-        'envs/cutadapt-3.5.yaml'
-    threads: 4
-    shell:
-        '''
-        cutadapt -a {params.adapter_fwd} -A {params.adapter_rev} \
-        -j {threads} -e {params.max_error_rate} -m {params.minimum_length} -q {params.quality_cutoff}\
-        -o {output.read1} -p {output.read2} {input.read1} {input.read2} >{output.qc}
-        '''
-
-rule cutadapt_fastqc:
-    input:
-        'out/cutadapt/{sample}_{read}.fastq.gz'
-    output:
-        'out/cutadapt/{sample}_{read}_fastqc.html',
-        'out/cutadapt/{sample}_{read}_fastqc.zip'
-    conda:
-        'envs/fastqc.yaml'
-    shell:
-        'fastqc -o out/cutadapt {input}'
-
-rule cutadapt_multiQC:
-    input:
-        fastqc = expand('out/cutadapt/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'}),
-        cutadapt = expand('out/cutadapt/{sample}.qc.txt', sample = ALL_SAMPLES)
-    output:
-        'out/cutadapt/multiqc_report.html'
-    params:
-        inputdir = 'out/cutadapt',
-        outputdir = 'out/cutadapt'
-    log:
-        'out/cutadapt/multiqc_report.log'
     conda:
         'envs/multiqc.yaml'
     shell:
@@ -201,64 +140,6 @@ rule bbduk_multiQC:
         outputdir = 'out/bbduk'
     log:
         'out/bbduk/multiqc_report.log'
-    conda:
-        'envs/multiqc.yaml'
-    shell:
-        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
-
-################################
-## use sickle to trim and filter reads
-
-# consider migrating to sickle wrapper:
-# https://snakemake-wrappers.readthedocs.io/en/stable/wrappers/sickle/pe.html
-rule sickle:
-    input:
-        read1 = 'out/cutadapt/{sample}_R1.fastq.gz',
-        read2 = 'out/cutadapt/{sample}_R2.fastq.gz'
-    output:
-        read1 = 'out/sickle/{sample}_R1.fastq.gz',
-        read2 = 'out/sickle/{sample}_R2.fastq.gz',
-        unpaired = 'out/sickle/{sample}_unpaired.fastq.gz'
-    log:
-        'out/sickle/{sample}_sickle.log'
-    params:
-        quality_threshold = config['sickle']['quality_threshold'],
-        length_threshold = config['sickle']['length_threshold']
-    conda:
-        'envs/sickle.yaml'
-    threads: 4
-    shell:
-        '''
-        sickle pe \
-            -f {input.read1} -r {input.read2} \
-            -t sanger -g \
-            -o {output.read1} -p {output.read2} -s {output.unpaired} \
-            -q {params.quality_threshold} -l {params.length_threshold} \
-            > {log}
-        '''
-
-rule sickle_fastqc:
-    input:
-        'out/sickle/{sample}_{read}.fastq.gz'
-    output:
-        'out/sickle/{sample}_{read}_fastqc.html',
-        'out/sickle/{sample}_{read}_fastqc.zip'
-    conda:
-        'envs/fastqc.yaml'
-    shell:
-        'fastqc -o out/sickle {input}'
-
-rule sickle_multiQC:
-    input:
-        fastqc = expand('out/sickle/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'}),
-        sickle = expand("out/sickle/{sample}_sickle.log", sample = ALL_SAMPLES)
-    output:
-        'out/sickle/multiqc_report.html'
-    params:
-        inputdir = 'out/sickle',
-        outputdir = 'out/sickle'
-    log:
-        'out/sickle/multiqc_report.log'
     conda:
         'envs/multiqc.yaml'
     shell:

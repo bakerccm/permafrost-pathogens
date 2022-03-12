@@ -4,15 +4,6 @@ sample_metadata:
 raw_data_dir:
     '/work/08186/cbaker/frontera/permafrost-pathogens-data'
 
-cutadapt:
-    quality_cutoff: 20
-    # trim sequences for TruSeq as recommended by Illumina
-    # (only includes the conserved part and not the indexes)
-    adapter_fwd: 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'
-    adapter_rev: 'AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT'
-    max_error_rate: 0.1
-    minimum_length: 50
-
 # see https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/ for guidance
 bbduk:
     memory: '-Xmx3g' # restrict memory usage to 3GB (Frontera nodes have 192GB)
@@ -25,10 +16,6 @@ bbduk:
     qtrim: 'r' # quality trim at 3' end only
     trimq: 10 # quality trim to Phred score 10
     minlength: 50
-
-sickle:
-    quality_threshold: 20
-    length_threshold: 50
 
 fastq-join:
     max_percent_difference: 8 # default: 8
