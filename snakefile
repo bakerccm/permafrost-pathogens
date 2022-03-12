@@ -316,11 +316,11 @@ rule fastq_join_multiQC:
 
 rule megahit:
     input:
-        read1 = ["out/bbduk/35m-t0-R1_R1.fastq.gz","out/bbduk/35m-t0-R2_R1.fastq.gz"],
-        read2 = ["out/bbduk/35m-t0-R1_R2.fastq.gz","out/bbduk/35m-t0-R2_R2.fastq.gz"]
+        read1 = expand("out/bbduk/35m-{temperature}-{replicate}_R1.fastq.gz", temperature = ["t0", "t2"], replicate = ["R1", "R2", "R3"]),
+        read2 = expand("out/bbduk/35m-{temperature}-{replicate}_R2.fastq.gz", temperature = ["t0", "t2"], replicate = ["R1", "R2", "R3"])
     output:
         directory("out/megahit")
-    threads: 32
+    threads: 56
     conda:
         'envs/megahit.yaml'
     shell:
