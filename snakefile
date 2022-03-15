@@ -33,7 +33,7 @@ ALL_SAMPLES = list(METADATA.index)
 
 rule all:
     input:
-        'out/raw/multiqc_report.html', 'out/bbduk/multiqc_report.html', 'out/fastq-join/multiqc_report.html'
+        'out/raw/multiqc_report.html', 'out/bbduk/multiqc_report.html', 'out/bbduk_noPhiX/multiqc_report.html', 'out/fastq-join/multiqc_report.html'
 
 ################################
 rule all_raw_data_links:
@@ -89,24 +89,26 @@ rule raw_multiQC:
         'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
+# see bbduk overview here http://seqanswers.com/forums/showthread.php?t=42776
 rule bbduk:
     input:
         read1 = 'data/links/{sample}_R1.fastq.gz',
         read2 = 'data/links/{sample}_R2.fastq.gz'
     output:
         read1 = 'out/bbduk/{sample}_R1.fastq.gz',
-        read2 = 'out/bbduk/{sample}_R2.fastq.gz'
+        read2 = 'out/bbduk/{sample}_R2.fastq.gz',
+        stats = 'out/bbduk/{sample}_stats.txt'
     params:
         memory = config['bbduk']['memory'],
-        ref = config['bbduk']['ref'],
-        ktrim = config['bbduk']['ktrim'],
-        k = config['bbduk']['k'],
-        mink = config['bbduk']['mink'],
-        hdist = config['bbduk']['hdist'],
-        trim_params = config['bbduk']['trim_params'],
-        qtrim = config['bbduk']['qtrim'],
-        trimq = config['bbduk']['trimq'],
-        minlength = config['bbduk']['minlength']
+        ref = config['bbduk']['adapter_trimming']['ref'],
+        ktrim = config['bbduk']['adapter_trimming']['ktrim'],
+        k = config['bbduk']['adapter_trimming']['k'],
+        mink = config['bbduk']['adapter_trimming']['mink'],
+        hdist = config['bbduk']['adapter_trimming']['hdist'],
+        trim_params = config['bbduk']['adapter_trimming']['trim_params'],
+        qtrim = config['bbduk']['quality_filtering']['qtrim'],
+        trimq = config['bbduk']['quality_filtering']['trimq'],
+        minlength = config['bbduk']['quality_filtering']['minlength']
     log:
         'out/bbduk/{sample}.log'
     conda:
@@ -114,9 +116,11 @@ rule bbduk:
     shell:
         '''
         bbduk.sh {params.memory} in1={input.read1} in2={input.read2} out1={output.read1} out2={output.read2} \
-        ref={params.ref} ktrim={params.ktrim} k={params.k} {params.trim_params} \
-        qtrim={params.qtrim} trimq={params.trimq} minlength={params.minlength} \
-        &>>{log}
+        # adapter filtering
+            ref={params.ref} ktrim={params.ktrim} k={params.k} mink={params.trim_params} hdist={params.hdist} {params.trim_params} \
+        # quality filtering
+            qtrim={params.qtrim} trimq={params.trimq} minlength={params.minlength} \
+        stats={output.stats} &>>{log}
         '''
 
 rule bbduk_fastqc:
@@ -140,6 +144,61 @@ rule bbduk_multiQC:
         outputdir = 'out/bbduk'
     log:
         'out/bbduk/multiqc_report.log'
+    conda:
+        'envs/multiqc.yaml'
+    shell:
+        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
+
+################################
+
+rule bbduk_noPhiX:
+    input:
+        read1 = 'out/bbduk/{sample}_R1.fastq.gz',
+        read2 = 'out/bbduk/{sample}_R2.fastq.gz'
+    output:
+        read1_unmatched = 'out/bbduk_noPhiX/{sample}_unmatched_R1.fastq.gz', # unmatched reads are not PhiX
+        read2_unmatched = 'out/bbduk_noPhiX/{sample}_unmatched_R2.fastq.gz',
+        read1_matched = 'out/bbduk_noPhiX/{sample}_matched_R1.fastq.gz', # matched reads are PhiX; consider just discarding these
+        read2_matched = 'out/bbduk_noPhiX/{sample}_matched_R2.fastq.gz',
+        stats = 'out/bbduk_noPhiX/{sample}_stats.txt'
+    params:
+        memory = config['bbduk']['memory'],
+        ref = config['bbduk']['contaminant_filtering']['ref'],
+        k = config['bbduk']['contaminant_filtering']['k'],
+        hdist = config['bbduk']['contaminant_filtering']['hdist']
+    log:
+        'out/bbduk_noPhiX/{sample}.log'
+    conda:
+        'envs/bbtools.yaml'
+    shell:
+        '''
+        bbduk.sh {params.memory} in1={input.read1} in2={input.read2} out1={output.read1_unmatched} out2={output.read2_unmatched} outm1={output.read1_matched} outm2={output.read2_matched} \
+        # contaminant filtering
+            ref={params.ref} k={params.k} hdist={params.hdist} \
+        stats={output.stats} &>>{log}
+        '''
+
+rule bbduk_noPhiX_fastqc:
+    input:
+        'out/bbduk_noPhiX/{sample}_unmatched_{read}.fastq.gz'
+    output:
+        'out/bbduk_noPhiX/{sample}_unmatched_{read}_fastqc.html',
+        'out/bbduk_noPhiX/{sample}_unmatched_{read}_fastqc.zip'
+    conda:
+        'envs/fastqc.yaml'
+    shell:
+        'fastqc -o out/bbduk_noPhiX {input}'
+
+rule bbduk_noPhiX_multiQC:
+    input:
+        fastqc = expand('out/bbduk_noPhiX/{sample}_unmatched_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+    output:
+        'out/bbduk_noPhiX/multiqc_report.html'
+    params:
+        inputdir = 'out/bbduk_noPhiX',
+        outputdir = 'out/bbduk_noPhiX'
+    log:
+        'out/bbduk_noPhiX/multiqc_report.log'
     conda:
         'envs/multiqc.yaml'
     shell:

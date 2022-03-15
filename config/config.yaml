@@ -5,17 +5,24 @@ raw_data_dir:
     '/work/08186/cbaker/frontera/permafrost-pathogens-data'
 
 # see https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/ for guidance
+# see also suggested values in post from Brian Bushnell http://seqanswers.com/forums/showthread.php?t=42776
 bbduk:
-    memory: '-Xmx3g' # restrict memory usage to 3GB (Frontera nodes have 192GB)
-    ref: 'config/adapters.fa' # path to copy of file from BBTools, as file is found with conda install
-    ktrim: 'r' # trim adapters from 3' end only
-    k: 20 # should be less than length of adapters
-    mink: 8 # min kmer length towards ends
-    hdist: 1 # hamming distance 1 allows up to 1 mismatch
-    trim_params: 'tbo' # trim adapters based on pair overlap detection using BBMerge
-    qtrim: 'r' # quality trim at 3' end only
-    trimq: 10 # quality trim to Phred score 10
-    minlength: 50
+    memory: '-Xmx3g' # restrict memory usage to 3GB (Frontera nodes have 56 cores and 192G memory)
+    adapter_trimming:
+        ref: 'databases/adapters.fa' # path to copy of file from BBTools, as file is not found with conda install
+        ktrim: 'r' # trim adapters from 3' end only
+        k: 20 # kmer size should be less than length of adapters
+        mink: 8 # min kmer length towards ends
+        hdist: 1 # hamming distance 1 allows up to 1 mismatch
+        trim_params: 'tbo' # trim adapters based on pair overlap detection using BBMerge
+    quality_filtering:
+        qtrim: 'rl' # quality trim at 3' end only
+        trimq: 10 # quality trim to Phred score 10
+        minlength: 50
+    contaminant_filtering: # PhiX
+        ref: 'databases/phix174_ill.ref.fa.gz' # path to copy of file from BBTools, as file is not found with conda install
+        k: 31 # kmer size
+        hdist: 1 # hamming distance 1 allows up to 1 mismatch
 
 fastq-join:
     max_percent_difference: 8 # default: 8

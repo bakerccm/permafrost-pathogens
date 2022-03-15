@@ -3,4 +3,4 @@ channels:
  - agbiome
  - bioconda
 dependencies:
- - bbtools
+ - bbtools=37.62
