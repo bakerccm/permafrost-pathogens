@@ -118,7 +118,7 @@ rule bbduk:
         bbduk.sh {params.memory} \
         in1={input.read1} in2={input.read2} \
         out1={output.read1} out2={output.read2} \
-        ref={params.ref} ktrim={params.ktrim} k={params.k} mink={params.trim_params} hdist={params.hdist} {params.trim_params} \
+        ref={params.ref} ktrim={params.ktrim} k={params.k} mink={params.mink} hdist={params.hdist} {params.trim_params} \
         qtrim={params.qtrim} trimq={params.trimq} minlength={params.minlength} \
         stats={output.stats} &>>{log}
         '''
