@@ -116,10 +116,8 @@ rule bbduk:
     shell:
         '''
         bbduk.sh {params.memory} in1={input.read1} in2={input.read2} out1={output.read1} out2={output.read2} \
-        # adapter filtering
-            ref={params.ref} ktrim={params.ktrim} k={params.k} mink={params.trim_params} hdist={params.hdist} {params.trim_params} \
-        # quality filtering
-            qtrim={params.qtrim} trimq={params.trimq} minlength={params.minlength} \
+        ref={params.ref} ktrim={params.ktrim} k={params.k} mink={params.trim_params} hdist={params.hdist} {params.trim_params} \ # adapter filtering
+        qtrim={params.qtrim} trimq={params.trimq} minlength={params.minlength} \ # quality filtering
         stats={output.stats} &>>{log}
         '''
 
@@ -173,8 +171,7 @@ rule bbduk_noPhiX:
     shell:
         '''
         bbduk.sh {params.memory} in1={input.read1} in2={input.read2} out1={output.read1_unmatched} out2={output.read2_unmatched} outm1={output.read1_matched} outm2={output.read2_matched} \
-        # contaminant filtering
-            ref={params.ref} k={params.k} hdist={params.hdist} \
+        ref={params.ref} k={params.k} hdist={params.hdist} \ # contaminant filtering
         stats={output.stats} &>>{log}
         '''
 
