@@ -115,9 +115,11 @@ rule bbduk:
         'envs/bbtools.yaml'
     shell:
         '''
-        bbduk.sh {params.memory} in1={input.read1} in2={input.read2} out1={output.read1} out2={output.read2} \
-        ref={params.ref} ktrim={params.ktrim} k={params.k} mink={params.trim_params} hdist={params.hdist} {params.trim_params} \ # adapter filtering
-        qtrim={params.qtrim} trimq={params.trimq} minlength={params.minlength} \ # quality filtering
+        bbduk.sh {params.memory} \
+        in1={input.read1} in2={input.read2} \
+        out1={output.read1} out2={output.read2} \
+        ref={params.ref} ktrim={params.ktrim} k={params.k} mink={params.trim_params} hdist={params.hdist} {params.trim_params} \
+        qtrim={params.qtrim} trimq={params.trimq} minlength={params.minlength} \
         stats={output.stats} &>>{log}
         '''
 
@@ -170,8 +172,9 @@ rule bbduk_noPhiX:
         'envs/bbtools.yaml'
     shell:
         '''
-        bbduk.sh {params.memory} in1={input.read1} in2={input.read2} out1={output.read1_unmatched} out2={output.read2_unmatched} outm1={output.read1_matched} outm2={output.read2_matched} \
-        ref={params.ref} k={params.k} hdist={params.hdist} \ # contaminant filtering
+        bbduk.sh {params.memory} in1={input.read1} in2={input.read2} \
+        out1={output.read1_unmatched} out2={output.read2_unmatched} outm1={output.read1_matched} outm2={output.read2_matched} \
+        ref={params.ref} k={params.k} hdist={params.hdist} \
         stats={output.stats} &>>{log}
         '''
 
