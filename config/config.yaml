@@ -7,7 +7,7 @@ raw_data_dir:
 # see https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/ for guidance
 # see also suggested values in post from Brian Bushnell http://seqanswers.com/forums/showthread.php?t=42776
 bbduk:
-    memory: '-Xmx6g' # restrict memory usage to 6GB (Frontera nodes have 56 cores and 192GB memory, so run a max of ~28 jobs)
+    memory: '-Xmx3g' # restrict memory usage to 3GB (Frontera nodes have 56 cores and 192GB memory)
     adapter_trimming:
         ref: 'databases/adapters.fa' # path to copy of file from BBTools, as file is not found with conda install
         ktrim: 'r' # trim adapters from 3' end only
