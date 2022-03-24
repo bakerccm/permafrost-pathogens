@@ -33,7 +33,7 @@ ALL_SAMPLES = list(METADATA.index)
 
 rule all:
     input:
-        'out/raw/multiqc_report.html', 'out/bbduk/multiqc_report.html', 'out/bbduk_noPhiX/multiqc_report.html', 'out/bbduk_noPhiX_dedupe/multiqc_report.html', 'out/fastq-join/multiqc_report.html'
+        'out/raw/multiqc_report.html', 'out/bbduk/multiqc_report.html', 'out/bbduk_noPhiX/multiqc_report.html', 'out/bbduk_noPhiX_dedupe/multiqc_report.html' # 'out/fastq-join/multiqc_report.html'
 
 ################################
 rule all_raw_data_links:
@@ -225,10 +225,11 @@ rule dedupe:
         tempfile = 'out/bbduk_noPhiX_dedupe/{sample}.fastq' # interleaved file output by dedupe.sh
     conda:
         'envs/bbtools.yaml'
+    threads: 56
     shell:
         '''
         # de-duplicate sample, producing interleaved output
-            dedupe.sh {params.memory} \
+            dedupe.sh {params.memory} threads={threads} \
                 in1={input.read1} in2={input.read2} out={params.tempfile} absorbcontainment=f
         # de-interleave output from dedupe.sh
             reformat.sh in={params.tempfile} out1={output.read1} out2={output.read2}
@@ -315,33 +316,46 @@ rule fastq_join_multiQC:
 ################################
 # megahit assembly
 
+# co-assembly of all temperatures and replicates together for each location
+# rule megahit:
+#     input:
+#         read1 = expand("out/bbduk/35m-{temperature}-{replicate}_R1.fastq.gz", temperature = ["t0", "t2"], replicate = ["R1", "R2", "R3"]),
+#         read2 = expand("out/bbduk/35m-{temperature}-{replicate}_R2.fastq.gz", temperature = ["t0", "t2"], replicate = ["R1", "R2", "R3"])
+#     output:
+#         directory("out/megahit")
+#     threads: 56
+#     conda:
+#         'envs/megahit.yaml'
+#     shell:
+#         '''
+#         # get file names and save as array
+#             read1_files_space=({input.read1})
+#             read2_files_space=({input.read2})
+#
+#         # use sed to replace spaces with commas (assumes no spaces in file names)
+#             read1_files_comma=`echo ${{read1_files_space[@]}} | sed 's/ /,/g'`
+#             read2_files_comma=`echo ${{read2_files_space[@]}} | sed 's/ /,/g'`
+#
+#         # uses printf to join array with commas (works even if file names contain spaces, but these will be passed through and will mess up snakemake unless file names are quoted)
+#             # printf -v joined_read1 '%s,' "${{read1_files_space[@]}}"
+#             # printf -v joined_read2 '%s,' "${{read2_files_space[@]}}"
+#             # read1_files_comma=`echo "${{joined_read1%,}}"`
+#             # read2_files_comma=`echo "${{joined_read2%,}}"`
+#
+#         megahit -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -t {threads} -o {output}
+#         '''
+
 rule megahit:
     input:
-        read1 = expand("out/bbduk/35m-{temperature}-{replicate}_R1.fastq.gz", temperature = ["t0", "t2"], replicate = ["R1", "R2", "R3"]),
-        read2 = expand("out/bbduk/35m-{temperature}-{replicate}_R2.fastq.gz", temperature = ["t0", "t2"], replicate = ["R1", "R2", "R3"])
+        read1 = expand("out/bbduk_noPhiX_dedupe/{sample}_R1.fastq.gz"),
+        read2 = expand("out/bbduk_noPhiX_dedupe/{sample}_R2.fastq.gz")
     output:
         directory("out/megahit")
     threads: 56
     conda:
         'envs/megahit.yaml'
     shell:
-        '''
-        # get file names and save as array
-            read1_files_space=({input.read1})
-            read2_files_space=({input.read2})
-        
-        # use sed to replace spaces with commas (assumes no spaces in file names)
-            read1_files_comma=`echo ${{read1_files_space[@]}} | sed 's/ /,/g'`
-            read2_files_comma=`echo ${{read2_files_space[@]}} | sed 's/ /,/g'`
-        
-        # uses printf to join array with commas (works even if file names contain spaces, but these will be passed through and will mess up snakemake unless file names are quoted)
-            # printf -v joined_read1 '%s,' "${{read1_files_space[@]}}"
-            # printf -v joined_read2 '%s,' "${{read2_files_space[@]}}"
-            # read1_files_comma=`echo "${{joined_read1%,}}"`
-            # read2_files_comma=`echo "${{joined_read2%,}}"`
-        
-        megahit -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -t {threads} -o {output}
-        '''
+        'megahit -1 {input.read1} -2 {input.read2} -t {threads} -o {output}'
 
 ################################
 # metaspades assembly
