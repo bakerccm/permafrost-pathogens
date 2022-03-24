@@ -225,11 +225,10 @@ rule dedupe:
         tempfile = 'out/bbduk_noPhiX_dedupe/{sample}.fastq' # interleaved file output by dedupe.sh
     conda:
         'envs/bbtools.yaml'
-    threads: config['dedupe']['threads']
     shell:
         '''
         # de-duplicate sample, producing interleaved output
-            dedupe.sh {params.memory} threads={threads} \
+            dedupe.sh {params.memory} \
                 in1={input.read1} in2={input.read2} out={params.tempfile} absorbcontainment=f
         # de-interleave output from dedupe.sh
             reformat.sh in={params.tempfile} out1={output.read1} out2={output.read2}
