@@ -1,0 +1,5 @@
+name: fastuniq-1.1
+channels:
+ - bioconda
+dependencies:
+ - fastuniq=1.1
