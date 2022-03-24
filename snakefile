@@ -225,7 +225,7 @@ rule dedupe:
         tempfile = 'out/bbduk_noPhiX_dedupe/{sample}.fastq' # interleaved file output by dedupe.sh
     conda:
         'envs/bbtools.yaml'
-    threads: 56
+    threads: 16
     shell:
         '''
         # de-duplicate sample, producing interleaved output
