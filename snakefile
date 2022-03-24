@@ -33,7 +33,7 @@ ALL_SAMPLES = list(METADATA.index)
 
 rule all:
     input:
-        'out/raw/multiqc_report.html', 'out/bbduk/multiqc_report.html', 'out/bbduk_noPhiX/multiqc_report.html', 'out/bbduk_noPhiX_dedupe/multiqc_report.html' #'out/fastq-join/multiqc_report.html'
+        'out/raw/multiqc_report.html', 'out/bbduk/multiqc_report.html', 'out/bbduk_noPhiX/multiqc_report.html', 'out/bbduk_noPhiX_dedupe/multiqc_report.html', 'out/fastq-join/multiqc_report.html'
 
 ################################
 rule all_raw_data_links:
@@ -269,8 +269,8 @@ rule bbduk_noPhiX_dedupe_multiQC:
 
 rule fastq_join:
     input:
-        read1 = 'out/bbduk/{sample}_R1.fastq.gz',
-        read2 = 'out/bbduk/{sample}_R2.fastq.gz'
+        read1 = 'out/bbduk_noPhiX_dedupe/{sample}_R1.fastq.gz',
+        read2 = 'out/bbduk_noPhiX_dedupe/{sample}_R2.fastq.gz'
     output:
         join = 'out/fastq-join/{sample}_join.fastq.gz',
         unmatched1 = 'out/fastq-join/{sample}_un1.fastq.gz',
