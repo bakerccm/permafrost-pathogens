@@ -25,7 +25,7 @@ bbduk:
         hdist: 1 # hamming distance 1 allows up to 1 mismatch
 
 dedupe:
-    memory: '-Xmx190g' # restrict memory usage to 96GB (Frontera nodes have 56 cores and 192GB memory)
+    memory: '-Xmx180g' # restrict memory usage to 180GB (Frontera nodes have 56 cores and 192GB memory)
 
 fastq-join:
     max_percent_difference: 8 # default: 8
