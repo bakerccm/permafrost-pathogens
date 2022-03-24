@@ -357,12 +357,24 @@ rule megahit:
     shell:
         'megahit -1 {input.read1} -2 {input.read2} -t {threads} -o {output}'
 
+rule megahit_quast:
+    input:
+        # may need to use yamle file or some other approach if co-assmblying many files
+        read1 = "out/megahit/35m-t0-R1_R1.fastq.gz",
+        read2 = "out/megahit/35m-t0-R1_R2.fastq.gz"
+    output:
+        directory("out/quast")
+    conda:
+        'envs/quast.yaml'
+    shell:
+        'quast.py {input.read1} {input_read2} -o {output}'
+
 ################################
 # metaspades assembly
 
 rule metaspades:
     input:
-        # may need to use yamle file or some other approach if co-assmblying many files
+        # may need to use yaml file or some other approach if co-assembling many files
         pe1_1 = "out/bbduk/35m-t0-R1_R1.fastq.gz", # library 1, read 1
         pe1_2 = "out/bbduk/35m-t0-R1_R2.fastq.gz", # library 1, read 2
         pe2_1 = "out/bbduk/35m-t0-R2_R1.fastq.gz", # library 1, read 1
