@@ -267,7 +267,7 @@ rule bbduk_noPhiX_dedupe_multiQC:
 # deduplicate using FastUniq
 
 # commands for testing
-# snakemake --use-conda -j 16 out/bbduk_noPhiX_fastuniq/35m-t0-R2_R1.fastq.gz
+# snakemake --use-conda -j 16 out/bbduk_noPhiX_fastuniq/35m-t0-R2_{R1,R2}.fastq.gz
 # snakemake --use-conda -j 56 -np fastuniq_all
 
 rule fastuniq_all:
@@ -289,7 +289,7 @@ rule fastuniq:
     output:
         filelist = 'out/bbduk_noPhiX_fastuniq/{sample}_input_filelist.txt',
         read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq', # note outputs are uncompressed
-        read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq'
+        read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq'  # should we make these temp()?
     params:
         filelist_name = 'out/bbduk_noPhiX_fastuniq/{sample}_input_filelist.txt'
     conda:
