@@ -267,8 +267,8 @@ rule bbduk_noPhiX_dedupe_multiQC:
 # deduplicate using FastUniq
 
 # commands for testing
-# snakemake --use-conda -j 16 out/bbduk_noPhiX_fastuniq/35m-t0-R2_{R1,R2}.fastq.gz
-# snakemake --use-conda -j 56 -np fastuniq_all
+# snakemake --use-conda --rerun-incomplete -j 16 out/bbduk_noPhiX_fastuniq/35m-t0-R2_{R1,R2}.fastq.gz
+# snakemake --use-conda --rerun-incomplete -j 2 -np fastuniq_all
 
 rule fastuniq_all:
     input:
@@ -294,6 +294,7 @@ rule fastuniq:
         filelist_name = 'out/bbduk_noPhiX_fastuniq/{sample}_input_filelist.txt'
     conda:
         'envs/fastuniq.yaml'
+    threads: 28
     shell:
         '''
         # save input file names to file
