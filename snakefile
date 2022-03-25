@@ -278,7 +278,7 @@ rule fastuniq:
     params:
         input_read1_uncompressed = 'out/bbduk_noPhiX/{sample}_unmatched_R1.fastq',
         input_read2_uncompressed = 'out/bbduk_noPhiX/{sample}_unmatched_R2.fastq',
-        filelist_name = 'out/bbduk_noPhiX_fastuniq/{sample}_input_filelist.txt'
+        filelist_name = 'out/bbduk_noPhiX_fastuniq/{sample}_input_filelist.txt',
         output_read1_uncompressed = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq',
         output_read2_uncompressed = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq'
     conda:
