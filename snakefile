@@ -272,7 +272,7 @@ rule bbduk_noPhiX_dedupe_multiQC:
 
 rule fastuniq_all:
     input:
-        expand(out/bbduk_noPhiX_fastuniq/{sample}_{read}.fastq.gz, sample = ALL_SAMPLES, read = {"R1","R2"})
+        expand('out/bbduk_noPhiX_fastuniq/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {"R1","R2"})
 
 rule fastuniq_decompress_inputs:
     input:
