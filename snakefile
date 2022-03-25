@@ -268,7 +268,7 @@ rule bbduk_noPhiX_dedupe_multiQC:
 
 # commands for testing
 # snakemake --use-conda --rerun-incomplete -j 16 out/bbduk_noPhiX_fastuniq/35m-t0-R2_{R1,R2}.fastq.gz
-# snakemake --use-conda --rerun-incomplete -j 2 -np fastuniq_all
+# snakemake --use-conda --rerun-incomplete -j 56 -np fastuniq_all
 
 rule fastuniq_all:
     input:
