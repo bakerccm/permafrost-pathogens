@@ -267,40 +267,45 @@ rule bbduk_noPhiX_dedupe_multiQC:
 # deduplicate using FastUniq
 
 # snakemake --use-conda -j 16 out/bbduk_noPhiX_fastuniq/35m-t0-R2_R1.fastq.gz
+# snakemake --use-conda -j 16 expand(out/bbduk_noPhiX_fastuniq/{sample}_{read}.fastq.gz, sample = ALL_SAMPLES, read = ("R1","R2"))
+
+rule fastuniq_decompress_inputs:
+    input:
+        'out/bbduk_noPhiX/{sample}_unmatched_{read}.fastq.gz' # unmatched reads are not PhiX
+    output:
+        temp('out/bbduk_noPhiX/{sample}_unmatched_{read}.fastq')
+    shell:
+        'zcat {input} >{output}'
 
 rule fastuniq:
     input:
-        read1 = 'out/bbduk_noPhiX/{sample}_unmatched_R1.fastq.gz', # unmatched reads are not PhiX
-        read2 = 'out/bbduk_noPhiX/{sample}_unmatched_R2.fastq.gz'
+        read1 = 'out/bbduk_noPhiX/{sample}_unmatched_R1.fastq', # unmatched reads are not PhiX
+        read2 = 'out/bbduk_noPhiX/{sample}_unmatched_R2.fastq'  # note inputs are uncompressed
     output:
-        read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz',
-        read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq.gz'
+        filelist = 'out/bbduk_noPhiX_fastuniq/{sample}_input_filelist.txt',
+        read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq', # note outputs are uncompressed
+        read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq'
     params:
-        input_read1_uncompressed = 'out/bbduk_noPhiX/{sample}_unmatched_R1.fastq',
-        input_read2_uncompressed = 'out/bbduk_noPhiX/{sample}_unmatched_R2.fastq',
-        filelist_name = 'out/bbduk_noPhiX_fastuniq/{sample}_input_filelist.txt',
-        output_read1_uncompressed = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq',
-        output_read2_uncompressed = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq'
+        filelist_name = 'out/bbduk_noPhiX_fastuniq/{sample}_input_filelist.txt'
     conda:
         'envs/fastuniq.yaml'
     shell:
         '''
-        # decompress input files
-            zcat {input.read1} >{params.input_read1_uncompressed}
-            zcat {input.read2} >{params.input_read2_uncompressed}
-        # save input file names to file (adjust extension if decompressed first)
-            echo {params.input_read1_uncompressed} >{params.filelist_name}
-            echo {params.input_read2_uncompressed} >>{params.filelist_name}
+        # save input file names to file
+            echo {input.read1} >{output.filelist}
+            echo {input.read2} >>{output.filelist}
         # run fastuniq
-            fastuniq -i {params.filelist_name} -t q -c 0 \
-            -o {params.output_read1_uncompressed} -p {params.output_read2_uncompressed}
-        # remove uncompressed input files
-            rm {params.input_read1_uncompressed}
-            rm {params.input_read2_uncompressed}
-        # recompress output files
-            gzip {params.output_read1_uncompressed}
-            gzip {params.output_read2_uncompressed}
+            fastuniq -i {output.filelist} -t q -c 0 \
+            -o {output.read1} -p {output.read2}
         '''
+
+rule fastuniq_compress_outputs:
+    input:
+        'out/bbduk_noPhiX_fastuniq/{sample}_{read}.fastq'
+    output:
+        'out/bbduk_noPhiX_fastuniq/{sample}_{read}.fastq.gz'
+    shell:
+        'gzip {output}'
 
 ################################
 ## use fastq-join from ea-utils to merge paired end reads
