@@ -264,6 +264,34 @@ rule bbduk_noPhiX_dedupe_multiQC:
         'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
+# deduplicate using FastUniq
+
+rule fastuniq:
+    input:
+        read1 = 'out/bbduk_noPhiX/{sample}_unmatched_R1.fastq.gz', # unmatched reads are not PhiX
+        read2 = 'out/bbduk_noPhiX/{sample}_unmatched_R2.fastq.gz'
+    output:
+        read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz',
+        read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq.gz'
+    params:
+        filelist_name = 'out/bbduk_noPhiX_fastuniq/{sample}_input_filelist.txt'
+    conda:
+        'envs/fastuniq.yaml'
+    shell:
+        '''
+        # decompress input files?
+            #
+        # save input file names to file (adjust extension if decompressed first)
+            echo {input.read1} >{params.filelist_name}
+            echo {input.read2} >>{params.filelist_name}
+        # run fastuniq
+            fastuniq -i {params.filelist_name} -t q -c 0 \
+            -o {output.read1} -p {output.read2}
+        # recompress output files?
+            #
+        '''
+
+################################
 ## use fastq-join from ea-utils to merge paired end reads
 # see https://github.com/ExpressionAnalysis/ea-utils/blob/wiki/FastqJoin.md
 
