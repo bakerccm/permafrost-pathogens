@@ -266,8 +266,13 @@ rule bbduk_noPhiX_dedupe_multiQC:
 ################################
 # deduplicate using FastUniq
 
+# commands for testing
 # snakemake --use-conda -j 16 out/bbduk_noPhiX_fastuniq/35m-t0-R2_R1.fastq.gz
-# snakemake --use-conda -j 16 expand(out/bbduk_noPhiX_fastuniq/{sample}_{read}.fastq.gz, sample = ALL_SAMPLES, read = ("R1","R2"))
+# snakemake --use-conda -j 56 -np fastuniq_all
+
+rule fastuniq_all:
+    input:
+        expand(out/bbduk_noPhiX_fastuniq/{sample}_{read}.fastq.gz, sample = ALL_SAMPLES, read = {"R1","R2"})
 
 rule fastuniq_decompress_inputs:
     input:
