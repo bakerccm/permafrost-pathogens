@@ -310,7 +310,7 @@ rule fastuniq_compress_outputs:
     output:
         'out/bbduk_noPhiX_fastuniq/{sample}_{read}.fastq.gz'
     shell:
-        'gzip {output}'
+        'gzip {input}'
 
 ################################
 ## use fastq-join from ea-utils to merge paired end reads
