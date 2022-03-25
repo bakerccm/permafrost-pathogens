@@ -266,6 +266,8 @@ rule bbduk_noPhiX_dedupe_multiQC:
 ################################
 # deduplicate using FastUniq
 
+# snakemake --use-conda -j 16 out/bbduk_noPhiX_fastuniq/35m-t0-R2_R1.fastq.gz
+
 rule fastuniq:
     input:
         read1 = 'out/bbduk_noPhiX/{sample}_unmatched_R1.fastq.gz', # unmatched reads are not PhiX
@@ -274,21 +276,30 @@ rule fastuniq:
         read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz',
         read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq.gz'
     params:
+        input_read1_uncompressed = 'out/bbduk_noPhiX/{sample}_unmatched_R1.fastq',
+        input_read2_uncompressed = 'out/bbduk_noPhiX/{sample}_unmatched_R2.fastq',
         filelist_name = 'out/bbduk_noPhiX_fastuniq/{sample}_input_filelist.txt'
+        output_read1_uncompressed = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq',
+        output_read2_uncompressed = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq'
     conda:
         'envs/fastuniq.yaml'
     shell:
         '''
-        # decompress input files?
-            #
+        # decompress input files
+            zcat {input.read1} >{params.input_read1_uncompressed}
+            zcat {input.read2} >{params.input_read2_uncompressed}
         # save input file names to file (adjust extension if decompressed first)
-            echo {input.read1} >{params.filelist_name}
-            echo {input.read2} >>{params.filelist_name}
+            echo {params.input_read1_uncompressed} >{params.filelist_name}
+            echo {params.input_read2_uncompressed} >>{params.filelist_name}
         # run fastuniq
             fastuniq -i {params.filelist_name} -t q -c 0 \
-            -o {output.read1} -p {output.read2}
-        # recompress output files?
-            #
+            -o {params.output_read1_uncompressed} -p {params.output_read2_uncompressed}
+        # remove uncompressed input files
+            rm {params.input_read1_uncompressed}
+            rm {params.input_read2_uncompressed}
+        # recompress output files
+            gzip {params.output_read1_uncompressed}
+            gzip {params.output_read2_uncompressed}
         '''
 
 ################################
