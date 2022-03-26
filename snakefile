@@ -313,6 +313,32 @@ rule fastuniq_compress_outputs:
     shell:
         'gzip {input}'
 
+rule fastuniq_fastqc:
+    input:
+        'out/bbduk_noPhiX_fastuniq/{sample}_{read}.fastq.gz'
+    output:
+        'out/bbduk_noPhiX_fastuniq/{sample}_{read}_fastqc.html',
+        'out/bbduk_noPhiX_fastuniq/{sample}_{read}_fastqc.zip'
+    conda:
+        'envs/fastqc.yaml'
+    shell:
+        'fastqc -o out/bbduk_noPhiX_fastuniq {input}'
+
+rule fastuniq_multiQC:
+    input:
+        fastqc = expand('out/bbduk_noPhiX_fastuniq/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+    output:
+        'out/bbduk_noPhiX_fastuniq/multiqc_report.html'
+    params:
+        inputdir = 'out/bbduk_noPhiX_fastuniq',
+        outputdir = 'out/bbduk_noPhiX_fastuniq'
+    log:
+        'out/bbduk_noPhiX_fastuniq/multiqc_report.log'
+    conda:
+        'envs/multiqc.yaml'
+    shell:
+        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
+
 ################################
 ## use fastq-join from ea-utils to merge paired end reads
 # see https://github.com/ExpressionAnalysis/ea-utils/blob/wiki/FastqJoin.md
