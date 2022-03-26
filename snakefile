@@ -423,8 +423,8 @@ rule fastq_join_multiQC:
 
 rule megahit:
     input:
-        read1 = 'out/bbduk_noPhiX_dedupe/35m-t0-R1_R1.fastq.gz',
-        read2 = 'out/bbduk_noPhiX_dedupe/35m-t0-R1_R2.fastq.gz'
+        read1 = 'out/bbduk_noPhiX_fastuniq/35m-t0-R1_R1.fastq.gz',
+        read2 = 'out/bbduk_noPhiX_fastuniq/35m-t0-R1_R2.fastq.gz'
     output:
         directory("out/megahit")
     threads: 56
@@ -435,7 +435,7 @@ rule megahit:
 
 rule megahit_quast:
     input:
-        # may need to use yamle file or some other approach if co-assmblying many files
+        # may need to use yaml file or some other approach if co-assmblying many files
         read1 = "out/megahit/35m-t0-R1_R1.fastq.gz",
         read2 = "out/megahit/35m-t0-R1_R2.fastq.gz"
     output:
