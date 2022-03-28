@@ -449,28 +449,3 @@ rule megahit_metaquast:
         'metaquast.py -o {output} -t {threads} --max-ref-number 0 {input.read1} {input_read2}'
 
 ################################
-# metaspades assembly
-
-rule metaspades:
-    input:
-        # may need to use yaml file or some other approach if co-assembling many files
-        pe1_1 = "out/bbduk/35m-t0-R1_R1.fastq.gz", # library 1, read 1
-        pe1_2 = "out/bbduk/35m-t0-R1_R2.fastq.gz", # library 1, read 2
-        pe2_1 = "out/bbduk/35m-t0-R2_R1.fastq.gz", # library 1, read 1
-        pe2_2 = "out/bbduk/35m-t0-R2_R2.fastq.gz"  # library 2, read 2
-    output:
-        directory("out/metaspades")
-    threads: 32
-    conda:
-        'envs/spades.yaml'
-    shell:
-        # note hard codes memory limit of 180Gb here (Frontera nodes have 192Gb so this should run on a single node if it's the only job running)
-        # note that this fails OOM if the limit is set to 190Gb
-        '''
-        metaspades.py -t {threads} -m 180 \
-        --pe1-1 {input.pe1_1} --pe1-2 {input.pe1_2} \
-        --pe2-1 {input.pe2_1} --pe2-2 {input.pe2_2} \
-        -o {output}
-        '''
-
-################################
