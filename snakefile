@@ -446,6 +446,6 @@ rule megahit_metaquast:
     shell:
         # use --gene-finding (of -f) to find genes using MetaGeneMark
         # use --max-ref-number 0 to skip searching against SILVA and downloading refs
-        'metaquast.py -o {output} -t {threads} --max-ref-number 0 {input.read1} {input_read2}'
+        'metaquast.py -o {output} -t {threads} --max-ref-number 0 {input}'
 
 ################################
