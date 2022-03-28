@@ -423,27 +423,30 @@ rule fastq_join_multiQC:
 
 rule megahit:
     input:
-        read1 = 'out/bbduk_noPhiX_fastuniq/35m-t0-R1_R1.fastq.gz',
-        read2 = 'out/bbduk_noPhiX_fastuniq/35m-t0-R1_R2.fastq.gz'
+        read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz',
+        read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq.gz'
     output:
-        directory("out/megahit")
+        "out/megahit/{sample}/final.contigs.fa"
+    params:
+        output_dir = "out/megahit/{sample}"
     threads: 56
     conda:
         'envs/megahit.yaml'
     shell:
-        'megahit -1 {input.read1} -2 {input.read2} -t {threads} -o {output}'
+        'megahit -1 {input.read1} -2 {input.read2} -t {threads} -o {params.output_dir}'
 
-rule megahit_quast:
+rule megahit_metaquast:
     input:
-        # may need to use yaml file or some other approach if co-assmblying many files
-        read1 = "out/megahit/35m-t0-R1_R1.fastq.gz",
-        read2 = "out/megahit/35m-t0-R1_R2.fastq.gz"
+        "out/megahit/{sample}/final.contigs.fa"
     output:
-        directory("out/quast")
+        directory("out/metaquast/{sample}")
+    threads: 4
     conda:
         'envs/quast.yaml'
     shell:
-        'quast.py {input.read1} {input_read2} -o {output}'
+        # use --gene-finding (of -f) to find genes using MetaGeneMark
+        # use --max-ref-number 0 to skip searching against SILVA and downloading refs
+        'metaquast.py -o {output} -t {threads} --max-ref-number 0 {input.read1} {input_read2}'
 
 ################################
 # metaspades assembly
