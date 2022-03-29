@@ -2,4 +2,4 @@ name: samtools
 channels:
  - bioconda
 dependencies:
- - samtools=1.10
+ - samtools=1.15
