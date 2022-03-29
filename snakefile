@@ -435,6 +435,68 @@ rule megahit:
     shell:
         'megahit -1 {input.read1} -2 {input.read2} -t {threads} -o {params.output_dir}'
 
+# co-assembles 35m samples, each replicate separately (excluding failed t1 samples)
+rule megahit_coassembly_35m_R:
+    input:
+        read1 = expand('out/bbduk_noPhiX_fastuniq/35m-{temperature}-{{replicate}}_R1.fastq.gz', temperature = ["t0", "t2"])
+        read2 = expand('out/bbduk_noPhiX_fastuniq/35m-{temperature}-{{replicate}}_R2.fastq.gz', temperature = ["t0", "t2"])
+    output:
+        "out/megahit/35m-{replicate}/final.contigs.fa"
+    params:
+        output_dir = "out/megahit/35m-{replicate}"
+    threads: 56
+    conda:
+        'envs/megahit.yaml'
+    shell:
+        '''
+        # get file names and store as array
+            read1_files_space=({input.read1})
+            read2_files_space=({input.read2})
+
+        # use sed to replace spaces with commas (assumes no spaces in file names)
+            read1_files_comma=`echo ${{read1_files_space[@]}} | sed 's/ /,/g'`
+            read2_files_comma=`echo ${{read2_files_space[@]}} | sed 's/ /,/g'`
+
+        # uses printf to join array with commas (works even if file names contain spaces, but these will be passed through and will mess up snakemake unless file names are quoted)
+            # printf -v joined_read1 '%s,' "${{read1_files_space[@]}}"
+            # printf -v joined_read2 '%s,' "${{read2_files_space[@]}}"
+            # read1_files_comma=`echo "${{joined_read1%,}}"`
+            # read2_files_comma=`echo "${{joined_read2%,}}"`
+
+        megahit -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -t {threads} -o {params.output_dir}
+        '''
+
+# co-assembles all 35m samples (excluding failed t1 samples)
+rule megahit_coassembly_35m:
+    input:
+        read1 = expand('out/bbduk_noPhiX_fastuniq/35m-{temperature}-{replicate}_R1.fastq.gz', temperature = ["t0", "t2"], replicate = ["R1", "R2", "R3"])
+        read2 = expand('out/bbduk_noPhiX_fastuniq/35m-{temperature}-{replicate}_R2.fastq.gz', temperature = ["t0", "t2"], replicate = ["R1", "R2", "R3"])
+    output:
+        "out/megahit/35m-{replicate}/final.contigs.fa"
+    params:
+        output_dir = "out/megahit/35m"
+    threads: 56
+    conda:
+        'envs/megahit.yaml'
+    shell:
+        '''
+        # get file names and store as array
+            read1_files_space=({input.read1})
+            read2_files_space=({input.read2})
+
+        # use sed to replace spaces with commas (assumes no spaces in file names)
+            read1_files_comma=`echo ${{read1_files_space[@]}} | sed 's/ /,/g'`
+            read2_files_comma=`echo ${{read2_files_space[@]}} | sed 's/ /,/g'`
+
+        # uses printf to join array with commas (works even if file names contain spaces, but these will be passed through and will mess up snakemake unless file names are quoted)
+            # printf -v joined_read1 '%s,' "${{read1_files_space[@]}}"
+            # printf -v joined_read2 '%s,' "${{read2_files_space[@]}}"
+            # read1_files_comma=`echo "${{joined_read1%,}}"`
+            # read2_files_comma=`echo "${{joined_read2%,}}"`
+
+        megahit -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -t {threads} -o {params.output_dir}
+        '''
+
 rule megahit_metaquast:
     input:
         "out/megahit/{sample}/final.contigs.fa"
