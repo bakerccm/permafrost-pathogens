@@ -511,3 +511,36 @@ rule megahit_metaquast:
         'metaquast.py -o {output} -t {threads} --max-ref-number 0 {input}'
 
 ################################
+# mapping to read assembly
+# see https://astrobiomike.github.io/metagenomics/metagen_anvio
+
+# create an index of co-assembly
+# for each co-assembly:
+conda activate bowtie2
+mkdir -p out/assemblies/35m-t0-R1 # at level of assembly or co-assembly
+bowtie2-build out/megahit/35m-t0-R1/final.contigs.fa out/assemblies/35m-t0-R1/assembly
+
+# run mapping
+# took about 20 min to do this on idev for this one sample
+# could probably use more cores
+# for each sample, and for each co-assembly you want to map it to:
+mkdir -p out/mapping/35m-t0-R1 # folder reflects co-assembly being mapped to
+bowtie2 -x out/assemblies/35m-t0-R1/assembly -q \
+-1 out/bbduk_noPhiX_fastuniq/35m-t0-R1_R1.fastq.gz \
+-2 out/bbduk_noPhiX_fastuniq/35m-t0-R1_R2.fastq.gz \
+--no-unal -p 4 -S out/mapping/35m-t0-R1/35m-t0-R1.sam # folder name reflects co-assembly being mapped to; file name reflects sample being mapped
+
+# convert sam to bam
+conda activate samtools
+# 5 min with one sample
+samtools view -b -o "out/mapping/35m-t0-R1/35m-t0-R1_raw.bam" "out/mapping/35m-t0-R1/35m-t0-R1.sam"
+
+# sort and index bam file
+# a couple of minutes on idev
+samtools sort -o "out/mapping/35m-t0-R1/35m-t0-R1.bam" "out/mapping/35m-t0-R1/35m-t0-R1_raw.bam"
+samtools index "out/mapping/35m-t0-R1/35m-t0-R1.bam"
+
+#
+conda activate anvio
+
+################################
