@@ -1,0 +1,6 @@
+name: centrifuge
+channels:
+ - bioconda
+ - defaults
+dependencies:
+ - centrifuge
