@@ -231,7 +231,7 @@ rule fastuniq:
     output:
         filelist = 'out/bbduk_noPhiX_fastuniq/{sample}_input_filelist.txt',
         read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq', # note outputs are uncompressed
-        read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq'  # should we make these temp()?
+        read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq'  # but these are actually removed if rule fastuniq_compress_outputs is run
     params:
         filelist_name = 'out/bbduk_noPhiX_fastuniq/{sample}_input_filelist.txt'
     conda:
