@@ -33,7 +33,7 @@ ALL_SAMPLES = list(METADATA.index)
 
 rule all:
     input:
-        'out/raw/multiqc_report.html', 'out/bbduk/multiqc_report.html', 'out/bbduk_noPhiX/multiqc_report.html', 'out/bbduk_noPhiX_dedupe/multiqc_report.html' # 'out/fastq-join/multiqc_report.html'
+        'out/raw/multiqc_report.html', 'out/bbduk/multiqc_report.html', 'out/bbduk_noPhiX/multiqc_report.html'
 
 ################################
 rule all_raw_data_links:
@@ -208,62 +208,6 @@ rule bbduk_noPhiX_multiQC:
         'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
-# deduplicate individual samples to help reduce computational burden
-# See https://sourceforge.net/p/bbmap/discussion/general/thread/6bcd3009/ for paired end syntax.
-# Note that dedupe.sh is designed for deduplicating assemblies. It is fast but consumes a lot of memory (~1kb per read).
-# It may not be memory efficient enough to deduplicate large amounts of raw data [reference?].
-# In that case consider a sort-based tool such as FastUniq (https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0052249)
-rule dedupe:
-    input:
-        read1 = 'out/bbduk_noPhiX/{sample}_unmatched_R1.fastq.gz', # unmatched reads are not PhiX
-        read2 = 'out/bbduk_noPhiX/{sample}_unmatched_R2.fastq.gz'
-    output:
-        read1 = 'out/bbduk_noPhiX_dedupe/{sample}_R1.fastq.gz',
-        read2 = 'out/bbduk_noPhiX_dedupe/{sample}_R2.fastq.gz'
-    params:
-        memory = config['dedupe']['memory'],
-        tempfile = 'out/bbduk_noPhiX_dedupe/{sample}.fastq' # interleaved file output by dedupe.sh
-    conda:
-        'envs/bbtools.yaml'
-    threads: 1
-    shell:
-        '''
-        # de-duplicate sample, producing interleaved output
-            dedupe.sh {params.memory} threads={threads} \
-                in1={input.read1} in2={input.read2} out={params.tempfile} absorbcontainment=f
-        # de-interleave output from dedupe.sh
-            reformat.sh in={params.tempfile} out1={output.read1} out2={output.read2}
-        # clean up
-            rm {params.tempfile}
-        '''
-
-rule bbduk_noPhiX_dedupe_fastqc:
-    input:
-        'out/bbduk_noPhiX_dedupe/{sample}_{read}.fastq.gz'
-    output:
-        'out/bbduk_noPhiX_dedupe/{sample}_{read}_fastqc.html',
-        'out/bbduk_noPhiX_dedupe/{sample}_{read}_fastqc.zip'
-    conda:
-        'envs/fastqc.yaml'
-    shell:
-        'fastqc -o out/bbduk_noPhiX_dedupe {input}'
-
-rule bbduk_noPhiX_dedupe_multiQC:
-    input:
-        fastqc = expand('out/bbduk_noPhiX_dedupe/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
-    output:
-        'out/bbduk_noPhiX_dedupe/multiqc_report.html'
-    params:
-        inputdir = 'out/bbduk_noPhiX_dedupe',
-        outputdir = 'out/bbduk_noPhiX_dedupe'
-    log:
-        'out/bbduk_noPhiX_dedupe/multiqc_report.log'
-    conda:
-        'envs/multiqc.yaml'
-    shell:
-        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
-
-################################
 # deduplicate using FastUniq
 
 # commands for testing
@@ -334,56 +278,6 @@ rule fastuniq_multiQC:
         outputdir = 'out/bbduk_noPhiX_fastuniq'
     log:
         'out/bbduk_noPhiX_fastuniq/multiqc_report.log'
-    conda:
-        'envs/multiqc.yaml'
-    shell:
-        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
-
-################################
-## use fastq-join from ea-utils to merge paired end reads
-# see https://github.com/ExpressionAnalysis/ea-utils/blob/wiki/FastqJoin.md
-
-rule fastq_join:
-    input:
-        read1 = 'out/bbduk_noPhiX_dedupe/{sample}_R1.fastq.gz',
-        read2 = 'out/bbduk_noPhiX_dedupe/{sample}_R2.fastq.gz'
-    output:
-        join = 'out/fastq-join/{sample}_join.fastq.gz',
-        unmatched1 = 'out/fastq-join/{sample}_un1.fastq.gz',
-        unmatched2 = 'out/fastq-join/{sample}_un2.fastq.gz'
-    params:
-        max_percent_difference = config['fastq-join']['max_percent_difference'],
-        min_overlap = config['fastq-join']['min_overlap']
-    conda:
-        'envs/ea-utils.yaml'
-    shell:
-        '''
-        fastq-join -p {params.max_percent_difference} -m {params.min_overlap} \
-        {input.read1} {input.read2} \
-        -o {output.unmatched1} -o {output.unmatched2} -o {output.join}
-        '''
-
-rule fastq_join_fastqc:
-    input:
-        'out/fastq-join/{sample}_join.fastq.gz'
-    output:
-        'out/fastq-join/{sample}_join_fastqc.html',
-        'out/fastq-join/{sample}_join_fastqc.zip'
-    conda:
-        'envs/fastqc.yaml'
-    shell:
-        'fastqc -o out/fastq-join {input}'
-
-rule fastq_join_multiQC:
-    input:
-        fastqc = expand('out/fastq-join/{sample}_join_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
-    output:
-        'out/fastq-join/multiqc_report.html'
-    params:
-        inputdir = 'out/fastq-join',
-        outputdir = 'out/fastq-join'
-    log:
-        'out/fastq-join/multiqc_report.log'
     conda:
         'envs/multiqc.yaml'
     shell:
