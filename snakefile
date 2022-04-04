@@ -95,8 +95,8 @@ rule bbduk:
         read1 = 'data/links/{sample}_R1.fastq.gz',
         read2 = 'data/links/{sample}_R2.fastq.gz'
     output:
-        read1 = 'out/bbduk/{sample}_R1.fastq.gz',
-        read2 = 'out/bbduk/{sample}_R2.fastq.gz',
+        read1 = temp('out/bbduk/{sample}_R1.fastq.gz'),
+        read2 = temp('out/bbduk/{sample}_R2.fastq.gz'),
         stats = 'out/bbduk/{sample}_stats.txt'
     params:
         memory = config['bbduk']['memory'],
@@ -157,10 +157,8 @@ rule bbduk_noPhiX:
         read1 = 'out/bbduk/{sample}_R1.fastq.gz',
         read2 = 'out/bbduk/{sample}_R2.fastq.gz'
     output:
-        read1_unmatched = 'out/bbduk_noPhiX/{sample}_unmatched_R1.fastq.gz', # unmatched reads are not PhiX
-        read2_unmatched = 'out/bbduk_noPhiX/{sample}_unmatched_R2.fastq.gz',
-        read1_matched = 'out/bbduk_noPhiX/{sample}_matched_R1.fastq.gz', # matched reads are PhiX; consider just discarding these
-        read2_matched = 'out/bbduk_noPhiX/{sample}_matched_R2.fastq.gz',
+        read1_unmatched = temp('out/bbduk_noPhiX/{sample}_unmatched_R1.fastq.gz'), # unmatched reads are not PhiX
+        read2_unmatched = temp('out/bbduk_noPhiX/{sample}_unmatched_R2.fastq.gz'),
         stats = 'out/bbduk_noPhiX/{sample}_stats.txt'
     params:
         memory = config['bbduk']['memory'],
@@ -176,7 +174,7 @@ rule bbduk_noPhiX:
         '''
         bbduk.sh {params.memory} threads={threads} \
         in1={input.read1} in2={input.read2} \
-        out1={output.read1_unmatched} out2={output.read2_unmatched} outm1={output.read1_matched} outm2={output.read2_matched} \
+        out1={output.read1_unmatched} out2={output.read2_unmatched} \
         ref={params.ref} k={params.k} hdist={params.hdist} \
         stats={output.stats} &>>{log}
         '''
