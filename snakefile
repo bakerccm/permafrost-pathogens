@@ -33,7 +33,7 @@ ALL_SAMPLES = list(METADATA.index)
 
 rule all:
     input:
-        'out/raw/multiqc_report.html', 'out/bbduk/multiqc_report.html', 'out/bbduk_noPhiX/multiqc_report.html', 'out/bbduk_noPhiX_fastuniq/multiqc_report.html'
+        'out/raw/multiqc_report.html', 'out/bbduk/multiqc_report.html', 'out/bbduk_noPhiX/multiqc_report.html', 'out/bbduk_noPhiX_fastuniq/multiqc_report.html' # megahit
 
 ################################
 rule all_raw_data_links:
