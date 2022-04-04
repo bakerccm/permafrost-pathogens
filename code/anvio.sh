@@ -95,9 +95,9 @@ cd out/anvio/centrifuge
 wget https://raw.githubusercontent.com/infphilo/centrifuge/master/indices/Makefile
 # currently 415 archaeal, 25823 bacterial and xxxx viral genomes
 # make THREADS=48 p+h+v    # bacterial, human, and viral genomes [~12G]
-make THREADS=48 p_compressed    # bacterial genomes compressed at the species level [~4.2G]
-make THREADS=48 DONT_DUSTMASK=1 p_compressed # use DONT_DUSTMASK because of missing NBCI tools
-# make THREADS=48 p_compressed+h+v    # combination of the two above [~8G]
+make THREADS=52 p_compressed    # bacterial genomes compressed at the species level [~4.2G]
+make THREADS=52 DONT_DUSTMASK=1 p_compressed # use DONT_DUSTMASK because of missing NBCI tools
+# make THREADS=52 p_compressed+h+v    # combination of the two above [~8G]
 cd ../../..
 
 # run centrifuge
