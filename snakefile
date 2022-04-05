@@ -331,17 +331,20 @@ rule megahit_coassembly_35m:
         megahit -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -t {threads} -o {params.output_dir}
         '''
 
+# takes 5 min to run without gene finding
 rule megahit_metaquast:
     input:
         "out/megahit/{assembly}/final.contigs.fa"
     output:
         "out/metaquast/{assembly}/report.txt" # there are several other output files in this directory too
+    params:
+        output_dir: "out/metaquast/{assembly}"
     threads: 4
     conda:
         'envs/quast.yaml'
     shell:
         # use --gene-finding (of -f) to find genes using MetaGeneMark
         # use --max-ref-number 0 to skip searching against SILVA and downloading refs
-        'metaquast.py -o {output} -t {threads} --max-ref-number 0 --gene-finding {input}'
+        'metaquast.py -o {params.output_dir} -t {threads} --max-ref-number 0 --gene-finding {input}'
 
 ################################
