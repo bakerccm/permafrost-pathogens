@@ -27,6 +27,7 @@ wildcard_constraints:
 import pandas as pd
 METADATA = pd.read_csv(METADATA_FILE, sep = '\t', index_col = 'sample')
 ALL_SAMPLES = list(METADATA.index)
+GOOD_SAMPLES = list(METADATA[METADATA.co_assembly != "."].index) # samples shown as "." in the co_assembly column are controls or poor quality --> exclude from assemblies
 
 ################################
 # default rules
@@ -303,15 +304,17 @@ rule megahit:
         megahit -1 {input.read1} -2 {input.read2} -t {threads} -o {params.output_dir}
         '''
 
-# co-assembles all 35m samples (excluding failed t1 samples)
-rule megahit_coassembly_35m:
+# co-assembles samples excluding failed samples, according to co-assembly column in samples.tsv metadata file
+rule megahit_coassembly:
     input:
-        read1 = expand('out/bbduk_noPhiX_fastuniq/35m-{temperature}-{replicate}_R1.fastq.gz', temperature = ["t0", "t2"], replicate = ["R1", "R2", "R3"]),
-        read2 = expand('out/bbduk_noPhiX_fastuniq/35m-{temperature}-{replicate}_R2.fastq.gz', temperature = ["t0", "t2"], replicate = ["R1", "R2", "R3"])
+        read1 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + assembly for assembly in list(METADATA[METADATA.co_assembly == wildcards.assembly].read1)],
+        read2 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + assembly for assembly in list(METADATA[METADATA.co_assembly == wildcards.assembly].read2)]
     output:
-        "out/megahit/35m/final.contigs.fa"
+        "out/megahit/{assembly}/final.contigs.fa"
     params:
-        output_dir = "out/megahit/35m"
+        output_dir = "out/megahit/{assembly}"
+    log:
+        "out/megahit/{assembly}.log"
     threads: 56
     conda:
         'envs/megahit.yaml'
@@ -324,6 +327,13 @@ rule megahit_coassembly_35m:
         # use sed to replace spaces with commas (assumes no spaces in file names)
             read1_files_comma=`echo ${{read1_files_space[@]}} | sed 's/ /,/g'`
             read2_files_comma=`echo ${{read2_files_space[@]}} | sed 's/ /,/g'`
+
+        # write files names to log file
+            echo "Co-assembly: {wildcards.assembly}" >{log}
+            echo "Read 1 files" >>{log}
+            echo $read1_files_comma >>{log}
+            echo "Read 2 files" >>{log}
+            echo $read2_files_comma >>{log}
 
         # remove output directory (megahit will fail if already exists)
             rm -rf {params.output_dir}
