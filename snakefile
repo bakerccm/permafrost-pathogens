@@ -364,7 +364,7 @@ rule megahit_coassembly_35m:
         read1 = expand('out/bbduk_noPhiX_fastuniq/35m-{temperature}-{replicate}_R1.fastq.gz', temperature = ["t0", "t2"], replicate = ["R1", "R2", "R3"]),
         read2 = expand('out/bbduk_noPhiX_fastuniq/35m-{temperature}-{replicate}_R2.fastq.gz', temperature = ["t0", "t2"], replicate = ["R1", "R2", "R3"])
     output:
-        "out/megahit/35m-{replicate}/final.contigs.fa"
+        "out/megahit/35m/final.contigs.fa"
     params:
         output_dir = "out/megahit/35m"
     threads: 56
