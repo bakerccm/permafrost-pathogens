@@ -307,8 +307,8 @@ rule megahit:
 # co-assembles samples excluding failed samples, according to co-assembly column in samples.tsv metadata file
 rule megahit_coassembly:
     input:
-        read1 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + assembly for assembly in list(METADATA[METADATA.co_assembly == wildcards.assembly].read1)],
-        read2 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + assembly for assembly in list(METADATA[METADATA.co_assembly == wildcards.assembly].read2)]
+        read1 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R1.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
+        read2 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R2.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)]
     output:
         "out/megahit/{assembly}/final.contigs.fa"
     params:
