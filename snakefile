@@ -338,7 +338,7 @@ rule megahit_metaquast:
     output:
         "out/metaquast/{assembly}/report.txt" # there are several other output files in this directory too
     params:
-        output_dir: "out/metaquast/{assembly}"
+        output_dir = "out/metaquast/{assembly}"
     threads: 4
     conda:
         'envs/quast.yaml'
