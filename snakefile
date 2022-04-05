@@ -284,35 +284,6 @@ rule fastuniq_multiQC:
 ################################
 # megahit assembly
 
-# co-assembly of all temperatures and replicates together for each location
-# rule megahit:
-#     input:
-#         read1 = expand("out/bbduk/35m-{temperature}-{replicate}_R1.fastq.gz", temperature = ["t0", "t2"], replicate = ["R1", "R2", "R3"]),
-#         read2 = expand("out/bbduk/35m-{temperature}-{replicate}_R2.fastq.gz", temperature = ["t0", "t2"], replicate = ["R1", "R2", "R3"])
-#     output:
-#         directory("out/megahit")
-#     threads: 56
-#     conda:
-#         'envs/megahit.yaml'
-#     shell:
-#         '''
-#         # get file names and save as array
-#             read1_files_space=({input.read1})
-#             read2_files_space=({input.read2})
-#
-#         # use sed to replace spaces with commas (assumes no spaces in file names)
-#             read1_files_comma=`echo ${{read1_files_space[@]}} | sed 's/ /,/g'`
-#             read2_files_comma=`echo ${{read2_files_space[@]}} | sed 's/ /,/g'`
-#
-#         # uses printf to join array with commas (works even if file names contain spaces, but these will be passed through and will mess up snakemake unless file names are quoted)
-#             # printf -v joined_read1 '%s,' "${{read1_files_space[@]}}"
-#             # printf -v joined_read2 '%s,' "${{read2_files_space[@]}}"
-#             # read1_files_comma=`echo "${{joined_read1%,}}"`
-#             # read2_files_comma=`echo "${{joined_read2%,}}"`
-#
-#         megahit -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -t {threads} -o {output}
-#         '''
-
 rule megahit:
     input:
         read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz',
