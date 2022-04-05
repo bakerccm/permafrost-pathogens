@@ -285,6 +285,7 @@ rule fastuniq_multiQC:
 ################################
 # megahit assembly
 
+# assembles single samples
 rule megahit:
     input:
         read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz',
