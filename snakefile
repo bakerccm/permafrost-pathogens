@@ -344,7 +344,9 @@ rule megahit_metaquast:
         'envs/quast.yaml'
     shell:
         # use --gene-finding (of -f) to find genes using MetaGeneMark
+        # -- but this requires either a sourceforge installation of quast, or a manual change to the bioconda installation
+        # -- see https://github.com/ablab/quast/issues/84
         # use --max-ref-number 0 to skip searching against SILVA and downloading refs
-        'metaquast.py -o {params.output_dir} -t {threads} --max-ref-number 0 --gene-finding {input}'
+        'metaquast.py -o {params.output_dir} -t {threads} --max-ref-number 0 {input}'
 
 ################################
