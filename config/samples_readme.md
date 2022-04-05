@@ -1,6 +1,9 @@
 # readme for samples.tsv
 
  - `samples.tsv` was created manually from `permafrost_thaw_metadata.csv`
+ 
+   - co_assembly column allows samples to be grouped into co-assemblies for megahit
+   - samples with "." should be ignored either because of sample quality or because they are control samples etc
 
  - `permafrost_thaw_metadata.csv` was downloaded from the NCBI
 
