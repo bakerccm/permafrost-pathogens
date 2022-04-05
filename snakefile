@@ -333,9 +333,9 @@ rule megahit_coassembly_35m:
 
 rule megahit_metaquast:
     input:
-        "out/megahit/{sample}/final.contigs.fa"
+        "out/megahit/{assembly}/final.contigs.fa"
     output:
-        directory("out/metaquast/{sample}")
+        directory("out/metaquast/{assembly}")
     threads: 4
     conda:
         'envs/quast.yaml'
