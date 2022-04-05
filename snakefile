@@ -325,7 +325,12 @@ rule megahit:
     conda:
         'envs/megahit.yaml'
     shell:
-        'megahit -1 {input.read1} -2 {input.read2} -t {threads} -o {params.output_dir}'
+        '''
+        # remove output directory (megahit will fail if already exists)
+            rm -rf {params.output_dir}
+
+        megahit -1 {input.read1} -2 {input.read2} -t {threads} -o {params.output_dir}
+        '''
 
 # co-assembles 35m samples, each replicate separately (excluding failed t1 samples)
 rule megahit_coassembly_35m_R:
@@ -354,6 +359,9 @@ rule megahit_coassembly_35m_R:
             # printf -v joined_read2 '%s,' "${{read2_files_space[@]}}"
             # read1_files_comma=`echo "${{joined_read1%,}}"`
             # read2_files_comma=`echo "${{joined_read2%,}}"`
+
+        # remove output directory (megahit will fail if already exists)
+            rm -rf {params.output_dir}
 
         megahit -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -t {threads} -o {params.output_dir}
         '''
@@ -385,6 +393,9 @@ rule megahit_coassembly_35m:
             # printf -v joined_read2 '%s,' "${{read2_files_space[@]}}"
             # read1_files_comma=`echo "${{joined_read1%,}}"`
             # read2_files_comma=`echo "${{joined_read2%,}}"`
+
+        # remove output directory (megahit will fail if already exists)
+            rm -rf {params.output_dir}
 
         megahit -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -t {threads} -o {params.output_dir}
         '''
