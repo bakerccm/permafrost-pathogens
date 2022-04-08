@@ -83,10 +83,8 @@ anvi-run-ncbi-cogs --cog-data-dir out/anvio/COGs -c out/anvio/contigs.db  -T 4
 # prepare for centrifuge
 anvi-get-sequences-for-gene-calls -c "out/anvio/contigs.db" -o "out/anvio/gene_calls.fa"
 # install centrifuge and activate environment (actually, no need, centrifuge is already in the anvio conda environment)
-mamba env create -f envs/centrifuge.yaml
+mamba env create -f envs/centrifuge.yaml # installs centrifuge, jellyfish and mummer
 conda activate centrifuge
-conda install -c bioconda jellyfish # can this be added to the centrifuge.yaml file?
-mamba install -c bioconda mummer # likewise
 # prepare taxonomy database
 # follow links from https://github.com/infphilo/centrifuge on pre-built indices
 # --> http://www.ccb.jhu.edu/software/centrifuge/
