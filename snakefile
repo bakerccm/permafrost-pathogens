@@ -307,6 +307,12 @@ rule megahit:
         '''
 
 # co-assembles samples excluding failed samples, according to co-assembly column in samples.tsv metadata file
+# runtimes:
+#   35m: 04:02:15
+#   45m: 07:22:25
+#   60m: 08:35:44
+#   83m: 05:29:18
+#   NT : 10:20:45
 rule megahit_coassembly:
     input:
         read1 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R1.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
