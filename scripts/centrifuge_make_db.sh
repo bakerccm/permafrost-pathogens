@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH -N 1  # nodes
 #SBATCH -n 56  # cores (note TACC allocates whole nodes)
-#SBATCH -t 0-06:00  # runtime in D-HH:MM
+#SBATCH -t 2-00:00  # runtime in D-HH:MM
 #SBATCH -p small  # partition to submit to
 ##SBATCH --mem=192G  # total mem (note TACC allocates whole nodes; using this argument causes job to fail)
-#SBATCH -J snakemake
-#SBATCH -o slurm/snakemake.out
-#SBATCH -e slurm/snakemake.err
+#SBATCH -J centrifuge_make_db
+#SBATCH -o slurm/centrifuge_make_db.out
+#SBATCH -e slurm/centrifuge_make_db.err
 ##SBATCH --mail-type=BEGIN,END    # notifications: BEGIN,END,FAIL,ALL
 ##SBATCH --mail-user=
 ##SBATCH --dependency=after:jobid[:jobid...] job can begin after specified jobs have started
@@ -14,17 +14,10 @@
 ##SBATCH --dependency=afterok:jobid[:jobid...] job can begin after specified jobs have completed with exit code zero
 ##SBATCH --dependency=afternotok:jobid[:jobid...] job can begin after specified jobs have failed
 
-# use snakemake conda environment with snakemake 6.4.1 installed
-# note use of conda activate (preferred over source activate from conda v4.4 onwards)
-# conda activate snakemake
+source activate centrifuge
 
-source activate snakemake
+# cd $WORK/permafrost-pathogens/out/anvio/centrifuge
 
-# snakemake -j 56 --use-conda sickle_multiQC fastq_join_multiQC
+cd $SCRATCH/centrifuge
 
-snakemake -j 56 --use-conda megahit
-
-# snakemake -j 8 --use-conda some_rule --forcerun upstream_rule
-
-# snakemake -j 1 --use-conda -rerun-incomplete --unlock some_rule
-# snakemake -j 8 --use-conda -rerun-incomplete some_rule
+make THREADS=52 DONT_DUSTMASK=1 p_compressed
