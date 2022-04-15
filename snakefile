@@ -284,27 +284,7 @@ rule fastuniq_multiQC:
         'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
-# megahit assembly
-
-# assembles single samples
-rule megahit:
-    input:
-        read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz',
-        read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq.gz'
-    output:
-        "out/megahit/{sample}/final.contigs.fa"
-    params:
-        output_dir = "out/megahit/{sample}"
-    threads: 56
-    conda:
-        'envs/megahit.yaml'
-    shell:
-        '''
-        # remove output directory (megahit will fail if already exists)
-            rm -rf {params.output_dir}
-
-        megahit -1 {input.read1} -2 {input.read2} -t {threads} -o {params.output_dir}
-        '''
+# megahit co-assembly
 
 # co-assembles samples excluding failed samples, according to co-assembly column in samples.tsv metadata file
 # runtimes:
