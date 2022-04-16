@@ -3,6 +3,7 @@ channels:
  - bioconda
  - defaults
 dependencies:
+ - anvio
  - "sqlite >=3.31.1"
  - prodigal
  - mcl
