@@ -354,7 +354,7 @@ rule reformat_megahit_contigs:
     input:
         "out/megahit/{assembly}/final.contigs.fa"
     output:
-        "out/metaquast/{assembly}/contigs.fa"
+        "out/megahit/{assembly}/contigs.fa"
     params:
         min_length = 1000
     conda:
