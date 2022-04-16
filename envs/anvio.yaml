@@ -1,6 +1,7 @@
 name: anvio
 channels:
  - bioconda
+ - conda-forge
  - defaults
 dependencies:
  - anvio
