@@ -358,7 +358,7 @@ rule reformat_megahit_contigs:
     params:
         min_length = 1000
     conda:
-        'envs/anvio.yaml'
+        'envs/anvio-minimal.yaml'
     shell:
         'anvi-script-reformat-fasta {input} -o {output} -l {params.min_length} --simplify-names'
 
