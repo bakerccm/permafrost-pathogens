@@ -1,0 +1,6 @@
+name: anvio-minimal
+channels:
+ - bioconda
+ - defaults
+dependencies:
+ - anvio
