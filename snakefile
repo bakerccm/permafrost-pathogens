@@ -293,6 +293,7 @@ rule fastuniq_multiQC:
 #   60m: 08:35:44
 #   83m: 05:29:18
 #   NT : 10:20:45
+# N.B. MEGAHIT can optionally utilize a CUDA-enabled GPU to accelerate its SdBG contstruction.
 rule megahit_coassembly:
     input:
         read1 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R1.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
@@ -346,5 +347,19 @@ rule megahit_metaquast:
         # -- see https://github.com/ablab/quast/issues/84
         # use --max-ref-number 0 to skip searching against SILVA and downloading refs
         'metaquast.py -o {params.output_dir} -t {threads} --max-ref-number 0 {input}'
+
+################################
+
+rule reformat_megahit_contigs:
+    input:
+        "out/megahit/{assembly}/final.contigs.fa"
+    output:
+        "out/metaquast/{assembly}/contigs.fa"
+    params:
+        min_length = 1000
+    conda:
+        'envs/anvio.yaml'
+    shell:
+        'anvi-script-reformat-fasta {input} -o {output} -l {params.min_length} --simplify-names'
 
 ################################
