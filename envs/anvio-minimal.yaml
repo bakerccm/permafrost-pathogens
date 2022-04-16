@@ -1,6 +1,7 @@
 name: anvio-minimal
 channels:
  - bioconda
+ - conda-forge
  - defaults
 dependencies:
  - anvio
