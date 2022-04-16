@@ -4,4 +4,5 @@ channels:
  - conda-forge
  - defaults
 dependencies:
- - anvio
+ - anvio=7.1
+ - python=3.6
