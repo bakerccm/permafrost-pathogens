@@ -383,7 +383,7 @@ rule phyloflash:
         'out/phyloflash/{sample}.phyloFlash.log',
         'out/phyloflash/{sample}.phyloFlash.tar.gz'
     params:
-        out_dir = 'out/phyloflash',
+        output_dir = 'out/phyloflash',
         readlength = 100,
         dbhome_dir = 'databases/phyloflash/138.1'
     threads: 8
@@ -391,7 +391,7 @@ rule phyloflash:
         'envs/phyloflash.yaml'
     shell:
         '''
-        cd {params.outdir}
+        cd {params.output_dir}
         phyloFlash.pl -lib {wildcards.sample} -read1 ../../{input.read1} -read2 ../../{input.read2} \
         -CPUs {threads} -readlength {params.readlength} -dbhome ../../{params.dbhome_dir} -poscov -treemap -zip -log
         '''
