@@ -379,8 +379,11 @@ rule phyloflash:
         read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz', # cleaned data files
         read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq.gz'
     output:
-        "out/phyloflash/{sample}.txt"
+        'out/phyloFlash/{sample}.phyloFlash.html',
+        'out/phyloFlash/{sample}.phyloFlash.log',
+        'out/phyloFlash/{sample}.phyloFlash.tar.gz'
     params:
+        out_dir = 'out/phyloFlash',
         readlength = 100,
         dbhome_dir = 'databases/phyloflash/138.1'
     threads: 8
@@ -388,10 +391,9 @@ rule phyloflash:
         'envs/phyloflash.yaml'
     shell:
         '''
-        phyloFlash.pl -lib out/phyloflash/{wildcards.sample} -read1 {input.read1} -read2 {input.read2} \
-        -CPUs {threads} -readlength {params.readlength} -dbhome {params.dbhome_dir} -poscov -treemap -zip -log
-        
-        touch {output}
+        cd {params.outdir}
+        phyloFlash.pl -lib {wildcards.sample} -read1 ../../{input.read1} -read2 ../../{input.read2} \
+        -CPUs {threads} -readlength {params.readlength} -dbhome ../../{params.dbhome_dir} -poscov -treemap -zip -log
         '''
 
 
