@@ -416,21 +416,31 @@ rule phyloflash_compare:
 
 ################################
 
+rule all_singlem:
+    input:
+        expand('out/singlem/{sample}.otu_table.tsv', sample = GOOD_SAMPLES)
+
 rule singlem:
     input:
         read1 = 'data/links/{sample}_R1.fastq.gz', # may want to use adapter-filtered reads instead; manual suggests not quality filtering since it can make the reads too short
         read2 = 'data/links/{sample}_R2.fastq.gz'
     output:
-        'out/singlem/{sample}.done'
+        'out/singlem/{sample}.otu_table.tsv'
     conda:
         'envs/singlem.yaml'
     threads:
-        16
+        8
     shell:
         '''
-        # singlem pipe --sequences {input.read1} --otu_table {output} --threads {threads}
-        touch {output}
+        singlem pipe --forward {input.read1} --reverse {input.read2} \
+        --otu_table {output} --threads {threads}
         '''
+# other popular options:
+# --output_extras	Output more detailed information in the OTU table.
+# --assignment_method {pplacer,diamond,diamond_example}
+#   Specify taxonomic assignment method [default: pplacer].
+# conda activate /work2/08186/cbaker/frontera/permafrost-pathogens/.snakemake/conda/89cb197209c9f30f798aec2bc588a442
+# see singlem pipe --full_help for more help
 
 ################################
 
