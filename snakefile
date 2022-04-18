@@ -442,6 +442,21 @@ rule singlem:
 # conda activate /work2/08186/cbaker/frontera/permafrost-pathogens/.snakemake/conda/89cb197209c9f30f798aec2bc588a442
 # see singlem pipe --full_help for more help
 
+rule singlem_summarise:
+    input:
+        expand('out/singlem/{sample}.otu_table.tsv', sample = GOOD_SAMPLES)
+    output:
+        krona = 'out/singlem/all_good_samples.krona.html',
+        OTU_table = 'out/singlem/all_good_samples.otu_table.tsv'
+    conda:
+        'envs/singlem.yaml'
+    shell:
+        '''
+        singlem summarise --input_otu_tables {input} \
+        --krona {output.krona} --output_otu_table {output.OTU_table}
+        '''
+
+# consider clustering OTUs, rarefying, beta diversity etc
 ################################
 
 
