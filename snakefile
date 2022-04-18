@@ -415,3 +415,17 @@ rule phyloflash_compare:
         '''
 
 ################################
+
+rule phyloflash_compare:
+    input:
+        expand('out/phyloflash/{sample}.phyloFlash.tar.gz', sample = GOOD_SAMPLES)
+    output:
+        'out/phyloflash/all_good_samples.phyloFlash_compare.barplot.pdf',
+        'out/phyloflash/all_good_samples.phyloFlash_compare.heatmap.pdf'
+    conda:
+        'envs/phyloflash.yaml'
+    shell:
+        '''
+        cd out/phyloflash
+        phyloFlash_compare.pl --allzip --task barplot,heatmap,matrix,ntu_table -out all_good_samples.phyloFlash_compare
+        '''
