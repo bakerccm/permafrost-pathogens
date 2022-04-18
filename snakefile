@@ -388,7 +388,7 @@ rule phyloflash:
         'envs/phyloflash.yaml'
     shell:
         '''
-        phyloFlash.pl -lib {wildcards.sample} -read1 {input.read1} -read2 {input.read2} \
+        phyloFlash.pl -lib out/phyloflash/{wildcards.sample} -read1 {input.read1} -read2 {input.read2} \
         -CPUs {threads} -readlength {params.readlength} -dbhome {params.dbhome_dir} -poscov -treemap -zip -log
         
         touch {output}
