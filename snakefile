@@ -374,6 +374,10 @@ rule reformat_megahit_contigs:
 # (where the name reflects the version of the Silva database that was downloaded)
 # -- this name needs to be specified below (probably it should be in the config file)
 
+rule all_phyloflash:
+    input:
+        expand('out/phyloflash/{sample}.phyloFlash.html', sample = GOOD_SAMPLES)
+
 rule phyloflash:
     input:
         read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz', # cleaned data files
@@ -395,7 +399,5 @@ rule phyloflash:
         phyloFlash.pl -lib {wildcards.sample} -read1 ../../{input.read1} -read2 ../../{input.read2} \
         -CPUs {threads} -readlength {params.readlength} -dbhome ../../{params.dbhome_dir} -poscov -treemap -zip -log
         '''
-
-
 
 ################################
