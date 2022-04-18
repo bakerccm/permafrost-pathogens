@@ -379,11 +379,11 @@ rule phyloflash:
         read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz', # cleaned data files
         read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq.gz'
     output:
-        'out/phyloFlash/{sample}.phyloFlash.html',
-        'out/phyloFlash/{sample}.phyloFlash.log',
-        'out/phyloFlash/{sample}.phyloFlash.tar.gz'
+        'out/phyloflash/{sample}.phyloFlash.html',
+        'out/phyloflash/{sample}.phyloFlash.log',
+        'out/phyloflash/{sample}.phyloFlash.tar.gz'
     params:
-        out_dir = 'out/phyloFlash',
+        out_dir = 'out/phyloflash',
         readlength = 100,
         dbhome_dir = 'databases/phyloflash/138.1'
     threads: 8
