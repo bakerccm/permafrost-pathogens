@@ -400,4 +400,18 @@ rule phyloflash:
         -CPUs {threads} -readlength {params.readlength} -dbhome ../../{params.dbhome_dir} -poscov -treemap -zip -log
         '''
 
+rule phyloflash_compare:
+    input:
+        expand('out/phyloflash/{sample}.phyloFlash.tar.gz', sample = GOOD_SAMPLES)
+    output:
+        'out/phyloflash/done'
+    conda:
+        'envs/phyloflash.yaml'
+    shell:
+        '''
+        cd out/phyloflash
+        phyloFlash_compare.pl --allzip --task barplot,heatmap
+        touch done
+        '''
+
 ################################
