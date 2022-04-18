@@ -421,7 +421,7 @@ rule singlem:
         read1 = 'data/links/{sample}_R1.fastq.gz', # may want to use adapter-filtered reads instead; manual suggests not quality filtering since it can make the reads too short
         read2 = 'data/links/{sample}_R2.fastq.gz'
     output:
-        'out/singlem/done'
+        'out/singlem/{sample}.done'
     conda:
         'envs/singlem.yaml'
     threads:
@@ -429,7 +429,7 @@ rule singlem:
     shell:
         '''
         # singlem pipe --sequences {input.read1} --otu_table {output} --threads {threads}
-        touch done
+        touch {output}
         '''
 
 ################################
