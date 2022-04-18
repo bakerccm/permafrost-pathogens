@@ -349,7 +349,7 @@ rule megahit_metaquast:
         'metaquast.py -o {params.output_dir} -t {threads} --max-ref-number 0 {input}'
 
 ################################
-
+    # this rule fails with errors messages about missing contextvars and missing django
 rule reformat_megahit_contigs:
     input:
         "out/megahit/{assembly}/final.contigs.fa"
@@ -361,5 +361,39 @@ rule reformat_megahit_contigs:
         'envs/anvio-minimal.yaml'
     shell:
         'anvi-script-reformat-fasta {input} -o {output} -l {params.min_length} --simplify-names'
+
+################################
+# use phyloflash to do some SSU-based analysis
+
+# Note phyloflash database should be generated first using
+#    mkdir -p databases/phyloflash
+#    cd databases/phyloflash
+#    phyloFlash_makedb.pl --remote
+# This automatically retrieves sequence files from the internet and builds databases
+# e.g. this one goes at databases/phyloflash/138.1
+# (where the name reflects the version of the Silva database that was downloaded)
+# -- this name needs to be specified below (probably it should be in the config file)
+
+rule phyloflash:
+    input:
+        read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz', # cleaned data files
+        read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq.gz'
+    output:
+        "out/phyloflash/{sample}.txt"
+    params:
+        readlength = 100,
+        dbhome_dir = 'databases/phyloflash/138.1'
+    threads: 8
+    conda:
+        'envs/phyloflash.yaml'
+    shell:
+        '''
+        phyloFlash.pl -lib {wildcards.sample} -read1 {input.read1} -read2 {input.read1} \
+        -CPUs {threads} -readlength {params.readlength} -dbhome {params.dbhome_dir} -poscov -treemap -zip -log
+        
+        touch {output}
+        '''
+
+
 
 ################################
