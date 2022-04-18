@@ -411,21 +411,30 @@ rule phyloflash_compare:
     shell:
         '''
         cd out/phyloflash
-        phyloFlash_compare.pl --allzip --task barplot,heatmap -out all_good_samples.phyloFlash_compare
+        phyloFlash_compare.pl --allzip --task barplot,heatmap,matrix,ntu_table -out all_good_samples.phyloFlash_compare
         '''
 
 ################################
 
-rule phyloflash_compare:
+rule singlem:
     input:
-        expand('out/phyloflash/{sample}.phyloFlash.tar.gz', sample = GOOD_SAMPLES)
+        read1 = 'data/links/{sample}_R1.fastq.gz', # may want to use adapter-filtered reads instead; manual suggests not quality filtering since it can make the reads too short
+        read2 = 'data/links/{sample}_R2.fastq.gz'
     output:
-        'out/phyloflash/all_good_samples.phyloFlash_compare.barplot.pdf',
-        'out/phyloflash/all_good_samples.phyloFlash_compare.heatmap.pdf'
+        'out/singlem/done'
     conda:
-        'envs/phyloflash.yaml'
+        'envs/singlem.yaml'
+    threads:
+        16
     shell:
         '''
-        cd out/phyloflash
-        phyloFlash_compare.pl --allzip --task barplot,heatmap,matrix,ntu_table -out all_good_samples.phyloFlash_compare
+        # singlem pipe --sequences {input.read1} --otu_table {output} --threads {threads}
+        touch done
         '''
+
+################################
+
+
+
+
+################################
