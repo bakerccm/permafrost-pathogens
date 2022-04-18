@@ -1,0 +1,6 @@
+name: singlem
+channels:
+ - bioconda
+ - defaults
+dependencies:
+ - singlem
