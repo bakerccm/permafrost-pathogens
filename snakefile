@@ -541,8 +541,8 @@ rule get_bowtie_coverage:
         '''
         echo {input} >{params.bamfile_list}
         samtools coverage -b {params.bamfile_list} > {output.coverage}
+        awk '{{print $1"\t"$6}}' {output.coverage} | grep -v '^#' | 'out/megahit/{wildcards.assembly}/bowtie2_mapping/{wildcards.sample}_meandepth.txt'
         '''
-        # awk '{{print $1"\t"$6}}' {output.coverage} | grep -v '^#' | {output.meandepth}
 
 rule maxbin2:
     input:
