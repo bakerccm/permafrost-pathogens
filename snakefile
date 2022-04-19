@@ -543,8 +543,8 @@ rule maxbin2:
             printf "%s\n" "${{read1_files_array[@]}}" > {params.read_filelist}
             printf "%s\n" "${{read2_files_array[@]}}" >>{params.read_filelist}
 
-        #run_MaxBin.pl -contig {input} -out {params.output_file_header} \
-        #-thread {threads} -reads_list {params.read_filelist}
+        run_MaxBin.pl -contig {input} -out {params.output_file_header} \
+        -thread {threads} -reads_list {params.read_filelist}
         
         touch {output}
         '''
