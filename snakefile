@@ -478,16 +478,15 @@ rule bowtie2_build:
 
 rule all_bowtie2_mapping:
     input:
-        expand('out/megahit/{assembly}/bowtie2_mapping/{sample}.sam', zip, assembly = list(METADATA.co_assembly[GOOD_SAMPLES]), sample = GOOD_SAMPLES)
+        expand('out/megahit/{assembly}/bowtie2_mapping/{sample}.bam', zip, assembly = list(METADATA.co_assembly[GOOD_SAMPLES]), sample = GOOD_SAMPLES)
 
-# takes about 20 min to do this on idev for this one sample
 rule bowtie2_mapping:
     input:
         read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz',
         read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq.gz',
         bowtie2_index = 'out/megahit/{assembly}/bowtie2_index.1.bt2' # just one of the files
     output:
-        'out/megahit/{assembly}/bowtie2_mapping/{sample}.sam'
+        temp('out/megahit/{assembly}/bowtie2_mapping/{sample}.sam')
     params:
         bt2_index = 'out/megahit/{assembly}/bowtie2_index' # file path stem for bowtie2 index
     conda:
@@ -497,6 +496,25 @@ rule bowtie2_mapping:
         '''
         bowtie2 -1 {input.read1} -2 {input.read2} -q \
         -x {params.bt2_index} --no-unal --threads {threads} -S {output}
+        '''
+
+rule bowtie2_compress_sort_index:
+    input:
+        'out/megahit/{assembly}/bowtie2_mapping/{sample}.sam'
+    output:
+        'out/megahit/{assembly}/bowtie2_mapping/{sample}.bam'
+    conda:
+        'envs/samtools.yaml'
+    params:
+        temp_unsorted_bam = 'out/megahit/{assembly}/bowtie2_mapping/{sample}_raw.bam'
+    shell:
+        '''
+        # convert to unsorted bam
+            samtools view -b -o {params.temp_unsorted_bam} {input}
+        # sort bam file
+            samtools sort -o {output} {params.temp_unsorted_bam}
+        # index sorted bam
+            samtools index {output}
         '''
 
 ################################
