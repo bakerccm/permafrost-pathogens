@@ -581,4 +581,43 @@ rule maxbin2:
 # (optional) -verbose (as is. Warning: output log will be LOOOONG.)
 # (optional) -markerset (choose between 107 marker genes by default or 40 marker genes. see Marker Gene Note for more information.)
 
+# use checkM to assess putative genomes
+# note databases need to be downloaded first. see install instructions https://github.com/Ecogenomics/CheckM/wiki/Installation#how-to-install-checkm
+#   mkdir -p databases/checkm
+#   cd databases/checkm
+#   wget 'https://data.ace.uq.edu.au/public/CheckM_databases/checkm_data_2015_01_16.tar.gz' # 276 MB download
+#   tar -xvf 'checkm_data_2015_01_16.tar.gz' # unpacks to a 1.4G directory
+#   rm 'checkm_data_2015_01_16.tar.gz'
+
+rule checkm:
+    input:
+        'out/maxbin2/{assembly}' # maxbin2 output folder
+    output:
+        directory('out/maxbin2_checkm/{assembly}') # checkm output folder
+    params:
+        database_dir = 'databases/checkm'
+    conda:
+        'envs/checkm.yaml'
+    threads:
+        16
+    shell:
+        '''
+        # set database directory
+            checkm data setRoot {databases/checkm}
+        # run checkm
+        # note fasta extension is specified here - updated if using a different binning program
+            checkm lineage_wf -t {threads} -x fasta {input} {output}
+        '''
+
+# checkm lineage_wf runs the four mandatory steps of the lineage-specific workflow:
+#   (M) > checkm tree <bin folder> <output folder>
+#   (R) > checkm tree_qa <output folder>
+#   (M) > checkm lineage_set <output folder> <marker file>
+#   (M) > checkm analyze <marker file> <bin folder> <output folder>
+#   (M) > checkm qa <marker file> <output folder>
+
+# possible additional analyses see https://github.com/Ecogenomics/CheckM/wiki/Genome-Quality-Commands#tree
+#   checkm tree_qa <tree folder>
+# and possibly some additional qa outputs?
+# see https://github.com/Ecogenomics/CheckM/wiki/Genome-Quality-Commands#tree
 ################################
