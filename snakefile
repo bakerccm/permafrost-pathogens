@@ -546,13 +546,12 @@ rule get_bowtie_coverage:
 
 rule maxbin2:
     input:
-        'out/megahit/{assembly}/final.contigs.fa'
+        meandepth_tables = lambda wildcards: ('out/megahit/' + wildcards.assembly + '/bowtie2_mapping/' + sample + '_meandepth.txt' for sample in list(METADATA[METADATA["co_assembly"] == wildcards.assembly].index)),
+        contigs = 'out/megahit/{assembly}/final.contigs.fa'
     output:
         'out/maxbin2/{assembly}/done'
     params:
-        read1_files = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R1.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
-        read2_files = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R2.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
-        read_filelist = 'out/maxbin2/{assembly}/{assembly}_read_files.txt',
+        meandepth_filelist = 'out/maxbin2/{assembly}/{assembly}_meandepth_filelist.txt',
         output_file_header = 'out/maxbin2/{assembly}/{assembly}'
     conda:
         'envs/maxbin2.yaml'
@@ -560,15 +559,13 @@ rule maxbin2:
     shell:
         '''
         # get file names and store as array
-            read1_files_array=({params.read1_files})
-            read2_files_array=({params.read2_files})
+            meandepth_tables=({input.meandepth_tables})
 
         # print file names to file separated by newlines
-            printf "%s\n" "${{read1_files_array[@]}}" > {params.read_filelist}
-            printf "%s\n" "${{read2_files_array[@]}}" >>{params.read_filelist}
+            printf "%s\n" "${{meandepth_tables[@]}}" > {params.meandepth_filelist}
 
-        run_MaxBin.pl -contig {input} -out {params.output_file_header} \
-        -thread {threads} -reads_list {params.read_filelist}
+        run_MaxBin.pl -contig {input.contigs} -out {params.output_file_header} \
+        -thread {threads} -abund_list {params.meandepth_filelist}
         
         touch {output}
         '''
