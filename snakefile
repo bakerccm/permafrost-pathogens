@@ -462,16 +462,38 @@ rule singlem_summarise:
 
 rule all_bowtie2_build:
     input:
-        expand('out/megahit/{assembly}/bowtie2', assembly = {'35m','45m','60m','83m','NT'})
+        expand('out/megahit/{assembly}/bowtie2_index.1.bt2', assembly = {'35m','45m','60m','83m','NT'}) # just one of the files in each index
 
 rule bowtie2_build:
     input:
         'out/megahit/{assembly}/final.contigs.fa'
     output:
-        directory('out/megahit/{assembly}/bowtie2')
+        'out/megahit/{assembly}/bowtie2_index.1.bt2' # just one of the files; is this a good naming scheme?
+    params:
+        bt2_index = 'out/megahit/{assembly}/bowtie2_index' # file path stem for bowtie2 index
     conda:
         'envs/bowtie2.yaml'
     shell:
-        'bowtie2-build {input} {output}'
+        'bowtie2-build {input} {params.bt2_index}'
+
+# takes about 20 min to do this on idev for this one sample
+rule bowtie2_mapping:
+    input:
+        read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz',
+        read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq.gz',
+        bowtie2_index = 'out/megahit/{assembly}/bowtie2_index.1.bt2' # just one of the files
+    output:
+        'out/megahit/{assembly}/bowtie2_mapping/{sample}.sam'
+    params:
+        bt2_index = 'out/megahit/{assembly}/bowtie2_index' # file path stem for bowtie2 index
+    conda:
+        'envs/bowtie2.yaml'
+    shell:
+        '''
+        bowtie2 -x {params.bt2_index} -q \
+        -1 {input.read1} -2 {input.read2} \
+        --no-unal -p 8 -S {output}
+        '''
+
 
 ################################
