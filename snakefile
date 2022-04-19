@@ -513,8 +513,53 @@ rule bowtie2_compress_sort_index:
             samtools view -b -o {params.temp_unsorted_bam} {input}
         # sort bam file
             samtools sort -o {output} {params.temp_unsorted_bam}
+            rm {params.temp_unsorted_bam}
         # index sorted bam
             samtools index {output}
         '''
+
+################################
+
+rule maxbin2:
+    input:
+        'out/megahit/{assembly}/final.contigs.fa'
+    output:
+        'out/maxbin2/{assembly}/done'
+    params:
+        read1_files = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R1.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
+        read2_files = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R2.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
+        read_filelist = 'out/maxbin2/{assembly}/{assembly}_read_files.txt',
+        output_file_header = 'out/maxbin2/{assembly}/{assembly}'
+    conda:
+        'envs/maxbin2.yaml'
+    threads: 4
+    shell:
+        '''
+        # get file names and store as array
+            read1_files_array=({params.read1_files})
+            read2_files_array=({params.read2_files})
+
+        # print file names to file separated by newlines
+            printf "%s\n" "${read1_files_array[@]}" > {params.read_filelist}
+            printf "%s\n" "${read2_files_array[@]}" >>{params.read_filelist}
+
+        run_MaxBin.pl -contig {input} -out {params.output_file_header} \
+        -thread {threads} -reads_list {params.read_filelist}
+        
+        touch {output}
+        '''
+
+# --- at least one of the following parameters is needed
+# (semi-required) -abund (contig abundance files. To be explained in Abundance session below.)
+# (semi-required) -reads (reads file in fasta or fastq format. To be explained in Abundance session below.)
+# (semi-required) -abund_list (a list file of all contig abundance files.)
+# (semi-required) -reads_list (a list file of all reads file.)
+# other options
+# (optional) -prob_threshold (minimum probability for EM algorithm; default 0.8)
+# (optional) -plotmarker (specify this option if you want to plot the markers in each contig. Installing R is a must for this option to work.)
+# (optional) -verbose (as is. Warning: output log will be LOOOONG.)
+# (optional) -markerset (choose between 107 marker genes by default or 40 marker genes. see Marker Gene Note for more information.)
+
+
 
 ################################
