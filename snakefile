@@ -452,8 +452,8 @@ rule singlem_summarise:
         'envs/singlem.yaml'
     shell:
         '''
-        singlem summarise --input_otu_tables {input} \
-        --krona {output.krona} --output_otu_table {output.OTU_table}
+        singlem summarise --input_otu_tables {input} --krona {output.krona}
+        singlem summarise --input_otu_tables {input} --output_otu_table {output.OTU_table}
         '''
 
 # consider clustering OTUs, rarefying, beta diversity etc
