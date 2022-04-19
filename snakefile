@@ -524,6 +524,7 @@ rule bowtie2_compress_sort_index:
 
 rule all_bowtie_coverage:
     input:
+        # note this doesn't explicitly ask for the _meandepth output files
         expand('out/megahit/{assembly}/bowtie2_mapping/{sample}_coverage.txt', zip, assembly = list(METADATA.co_assembly[GOOD_SAMPLES]), sample = GOOD_SAMPLES)
 
 rule get_bowtie_coverage:
