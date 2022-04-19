@@ -530,7 +530,8 @@ rule get_bowtie_coverage:
     input:
         'out/megahit/{assembly}/bowtie2_mapping/{sample}.bam'
     output:
-        'out/megahit/{assembly}/bowtie2_mapping/{sample}_coverage.txt'
+        coverage = 'out/megahit/{assembly}/bowtie2_mapping/{sample}_coverage.txt', # full samtools coverage output
+        meandepth = 'out/megahit/{assembly}/bowtie2_mapping/{sample}_coverage.txt' # just the meandepth column from the coverage output table
     conda:
         'envs/samtools.yaml'
     params:
@@ -538,7 +539,8 @@ rule get_bowtie_coverage:
     shell:
         '''
         echo {input} >{params.bamfile_list}
-        samtools coverage -b {params.bamfile_list} > {output}
+        samtools coverage -b {params.bamfile_list} > {output.coverage}
+        awk '{print $1"\t"$6}' {output.coverage} | grep -v '^#' | {output.meandepth}
         '''
 
 rule maxbin2:
