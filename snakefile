@@ -476,6 +476,10 @@ rule bowtie2_build:
     shell:
         'bowtie2-build {input} {params.bt2_index}'
 
+rule all_bowtie2_mapping:
+    input:
+        expand('out/megahit/{assembly}/bowtie2_mapping/{sample}.sam', zip, assembly = list(METADATA.co_assembly[GOOD_SAMPLES]), sample = GOOD_SAMPLES)
+
 # takes about 20 min to do this on idev for this one sample
 rule bowtie2_mapping:
     input:
@@ -488,12 +492,11 @@ rule bowtie2_mapping:
         bt2_index = 'out/megahit/{assembly}/bowtie2_index' # file path stem for bowtie2 index
     conda:
         'envs/bowtie2.yaml'
+    threads: 8
     shell:
         '''
-        bowtie2 -x {params.bt2_index} -q \
-        -1 {input.read1} -2 {input.read2} \
-        --no-unal -p 8 -S {output}
+        bowtie2 -1 {input.read1} -2 {input.read2} -q \
+        -x {params.bt2_index} --no-unal --threads {threads} -S {output}
         '''
-
 
 ################################
