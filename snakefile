@@ -458,8 +458,20 @@ rule singlem_summarise:
 
 # consider clustering OTUs, rarefying, beta diversity etc
 ################################
+# create bowtie2 index for each megahit co-assembly
 
+rule all_bowtie2_build:
+    input:
+        expand('out/megahit/{assembly}/bowtie2', assembly = {'35m','45m','60m','83m','NT'})
 
-
+rule bowtie2_build:
+    input:
+        'out/megahit/{assembly}/final.contigs.fa'
+    output:
+        directory('out/megahit/{assembly}/bowtie2')
+    conda:
+        'envs/bowtie2.yaml'
+    shell:
+        'bowtie2-build {input} {output}'
 
 ################################
