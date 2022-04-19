@@ -520,6 +520,27 @@ rule bowtie2_compress_sort_index:
 
 ################################
 
+# get abundance info for each bowtie mapping
+
+rule all_bowtie_coverage:
+    input:
+        expand('out/megahit/{assembly}/bowtie2_mapping/{sample}_coverage.txt', zip, assembly = list(METADATA.co_assembly[GOOD_SAMPLES]), sample = GOOD_SAMPLES)
+
+rule get_bowtie_coverage:
+    input:
+        'out/megahit/{assembly}/bowtie2_mapping/{sample}.bam'
+    output:
+        'out/megahit/{assembly}/bowtie2_mapping/{sample}_coverage.txt'
+    conda:
+        'envs/samtools.yaml'
+    params:
+        bamfile_list = 'out/megahit/{assembly}/bowtie2_mapping/{sample}_bamfile_list.txt'
+    shell:
+        '''
+        echo {input} >{params.bamfile_list}
+        samtools coverage -b {params.bamfile_list} > {output}
+        '''
+
 rule maxbin2:
     input:
         'out/megahit/{assembly}/final.contigs.fa'
@@ -559,7 +580,5 @@ rule maxbin2:
 # (optional) -plotmarker (specify this option if you want to plot the markers in each contig. Installing R is a must for this option to work.)
 # (optional) -verbose (as is. Warning: output log will be LOOOONG.)
 # (optional) -markerset (choose between 107 marker genes by default or 40 marker genes. see Marker Gene Note for more information.)
-
-
 
 ################################
