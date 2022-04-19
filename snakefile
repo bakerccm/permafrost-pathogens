@@ -531,7 +531,7 @@ rule get_bowtie_coverage:
         'out/megahit/{assembly}/bowtie2_mapping/{sample}.bam'
     output:
         coverage = 'out/megahit/{assembly}/bowtie2_mapping/{sample}_coverage.txt', # full samtools coverage output
-        meandepth = 'out/megahit/{assembly}/bowtie2_mapping/{sample}_coverage.txt' # just the meandepth column from the coverage output table
+        meandepth = 'out/megahit/{assembly}/bowtie2_mapping/{sample}_meandepth.txt' # just the meandepth column from the coverage output table
     conda:
         'envs/samtools.yaml'
     params:
