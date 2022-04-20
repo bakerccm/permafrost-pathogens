@@ -589,6 +589,8 @@ rule maxbin2:
 #   tar -xvf 'checkm_data_2015_01_16.tar.gz' # unpacks to a 1.4G directory
 #   rm 'checkm_data_2015_01_16.tar.gz'
 
+# it would be good to make checkm output this to a file ... -f flag should do it I think
+
 rule checkm:
     input:
         'out/maxbin2/{assembly}' # maxbin2 output folder
