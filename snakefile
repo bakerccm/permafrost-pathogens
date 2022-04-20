@@ -555,7 +555,7 @@ rule maxbin2:
         output_file_header = 'out/maxbin2/{assembly}/{assembly}'
     conda:
         'envs/maxbin2.yaml'
-    threads: 24
+    threads: 16
     shell:
         '''
         # get file names and store as array
