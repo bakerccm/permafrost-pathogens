@@ -608,7 +608,7 @@ rule checkm:
             checkm data setRoot {params.database_dir}
         # run checkm
         # note fasta extension is specified here - updated if using a different binning program
-            checkm lineage_wf -t {threads} -x fasta {input} {output}
+            checkm lineage_wf -t {threads} -x fasta {input} {output} -f
         '''
 
 # checkm lineage_wf runs the four mandatory steps of the lineage-specific workflow:
