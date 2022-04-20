@@ -595,7 +595,8 @@ rule checkm:
     input:
         'out/maxbin2/{assembly}' # maxbin2 output folder
     output:
-        directory('out/maxbin2_checkm/{assembly}') # checkm output folder
+        dir = directory('out/maxbin2_checkm/{assembly}'), # checkm output folder
+        file = 'out/maxbin2_checkm/{assembly}.txt'
     params:
         database_dir = 'databases/checkm'
     conda:
@@ -608,7 +609,7 @@ rule checkm:
             checkm data setRoot {params.database_dir}
         # run checkm
         # note fasta extension is specified here - updated if using a different binning program
-            checkm lineage_wf -t {threads} -x fasta {input} {output} -f
+            checkm lineage_wf -t {threads} -x fasta {input} -f {output.file} {output.dir}
         '''
 
 # checkm lineage_wf runs the four mandatory steps of the lineage-specific workflow:
