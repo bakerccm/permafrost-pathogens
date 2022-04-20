@@ -603,7 +603,7 @@ rule checkm:
     shell:
         '''
         # set database directory
-            checkm data setRoot {databases/checkm}
+            checkm data setRoot {params.database_dir}
         # run checkm
         # note fasta extension is specified here - updated if using a different binning program
             checkm lineage_wf -t {threads} -x fasta {input} {output}
