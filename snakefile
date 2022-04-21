@@ -405,13 +405,16 @@ rule phyloflash_compare:
         expand('out/phyloflash/{sample}.phyloFlash.tar.gz', sample = GOOD_SAMPLES)
     output:
         'out/phyloflash/all_good_samples.phyloFlash_compare.barplot.pdf',
-        'out/phyloflash/all_good_samples.phyloFlash_compare.heatmap.pdf'
+        'out/phyloflash/all_good_samples.phyloFlash_compare.heatmap.pdf',
+        'out/phyloflash/all_good_samples.phyloFlash_compare.matrix.tsv',
+        'out/phyloflash/all_good_samples.phyloFlash_compare.ntu_table.tsv'
     conda:
         'envs/phyloflash.yaml'
     shell:
         '''
         cd out/phyloflash
         phyloFlash_compare.pl --allzip --task barplot,heatmap,matrix,ntu_table -out all_good_samples.phyloFlash_compare
+        # (or specify the actual files instead of the directory)
         '''
 
 ################################
