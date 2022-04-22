@@ -627,3 +627,18 @@ rule checkm:
 # and possibly some additional qa outputs?
 # see https://github.com/Ecogenomics/CheckM/wiki/Genome-Quality-Commands#tree
 ################################
+rule prokka:
+    input:
+        'out/maxbin2/{assembly}/{bin}.fasta'
+    output:
+        directory('out/maxbin2_prokka/{assembly}/{bin}') # maybe alter this once we know what output files look like
+    params:
+        out = 'databases/checkm'
+    conda:
+        'envs/prokka.yaml'
+    shell:
+        '''
+        prokka --outdir {output} --prefix {wildcards.bin} {input}
+        '''
+
+################################
