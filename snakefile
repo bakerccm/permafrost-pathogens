@@ -665,3 +665,29 @@ rule staramr:
         '''
 
 ################################
+# database needs to be set up first -- see https://github.com/arpcard/rgi#rgi-usage-documentation
+#   mkdir -p databases/RGI
+#   cd databases/RGI
+#   wget https://card.mcmaster.ca/latest/data
+#   tar -xvf data ./card.json
+#   cd ../..
+
+# rgi load --card_json /path/to/card.json --local
+
+rule rgi:
+    input:
+        #'out/maxbin2/{assembly}/{bin}.fasta'
+        'out/maxbin2/35m/35m.001.fasta'
+    output:
+        'out/maxbin2_rgi/35m/35m.001.txt')
+    conda:
+        'envs/rgi.yaml'
+    threads: 32
+    shell:
+        '''
+        rgi main --input_sequence {input} \
+          --output_file {output} --input_type contig --local \
+          --low_quality --include_loose --clean --num_threads {threads} --split_prodigal_jobs
+        '''
+
+################################
