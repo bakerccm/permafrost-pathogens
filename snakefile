@@ -679,7 +679,7 @@ rule rgi:
         #'out/maxbin2/{assembly}/{bin}.fasta'
         'out/maxbin2/35m/35m.001.fasta'
     output:
-        'out/maxbin2_rgi/35m/35m.001.txt')
+        'out/maxbin2_rgi/35m/35m.001.txt'
     conda:
         'envs/rgi.yaml'
     threads: 32
