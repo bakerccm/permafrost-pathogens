@@ -1,0 +1,9 @@
+name: staramr
+channels:
+ - bioconda
+ - conda-forge
+ - defaults
+dependencies:
+ - staramr==0.7.2
+ - pandas==1.1.5
+ - mlst==2.19.0

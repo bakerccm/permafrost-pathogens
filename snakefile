@@ -627,6 +627,13 @@ rule checkm:
 # and possibly some additional qa outputs?
 # see https://github.com/Ecogenomics/CheckM/wiki/Genome-Quality-Commands#tree
 ################################
+
+# need to automatically work out what files to ask for here, but for now this will do:
+# snakemake -j 56 --use-conda out/maxbin2_prokka/35m/35m.{001..053} # done
+# snakemake -j 56 --use-conda out/maxbin2_prokka/45m/45m.{001..107} # done
+# snakemake -j 56 --use-conda out/maxbin2_prokka/60m/60m.{001..099} # done
+# snakemake -j 56 --use-conda out/maxbin2_prokka/83m/83m.{001..071} # done
+# snakemake -j 56 --use-conda out/maxbin2_prokka/NT/NT.{001..096} # working on it
 rule prokka:
     input:
         'out/maxbin2/{assembly}/{bin}.fasta'
@@ -639,6 +646,22 @@ rule prokka:
     shell:
         '''
         prokka --outdir {output} --prefix {wildcards.bin} {input}
+        '''
+
+################################
+
+rule staramr:
+    input:
+        #'out/maxbin2/{assembly}/{bin}.fasta'
+        'out/maxbin2/35m/35m.001.fasta'
+    output:
+        #directory('out/maxbin2_staramr/{assembly}/{bin}') # maybe alter this once we know what output files look like
+        directory('out/maxbin2_staramr/35m/35m.001')
+    conda:
+        'envs/staramr.yaml'
+    shell:
+        '''
+        staramr search -o {output} {input}
         '''
 
 ################################
