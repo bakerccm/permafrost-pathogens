@@ -490,6 +490,8 @@ rule bowtie2_mapping:
         bowtie2_index = 'out/megahit/{assembly}/bowtie2_index.1.bt2' # just one of the files
     output:
         temp('out/megahit/{assembly}/bowtie2_mapping/{sample}.sam')
+    log:
+        'out/megahit/{assembly}/bowtie2_mapping/{sample}.log'
     params:
         bt2_index = 'out/megahit/{assembly}/bowtie2_index' # file path stem for bowtie2 index
     conda:
@@ -498,7 +500,7 @@ rule bowtie2_mapping:
     shell:
         '''
         bowtie2 -1 {input.read1} -2 {input.read2} -q \
-        -x {params.bt2_index} --no-unal --threads {threads} -S {output}
+        -x {params.bt2_index} --no-unal --threads {threads} -S {output} >{log}
         '''
 
 rule bowtie2_compress_sort_index:
