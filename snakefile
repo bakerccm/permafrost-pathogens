@@ -500,7 +500,7 @@ rule bowtie2_mapping:
     shell:
         '''
         bowtie2 -1 {input.read1} -2 {input.read2} -q \
-        -x {params.bt2_index} --no-unal --threads {threads} -S {output} >{log}
+        -x {params.bt2_index} --no-unal --threads {threads} -S {output} >>{log}
         '''
 
 rule bowtie2_compress_sort_index:
