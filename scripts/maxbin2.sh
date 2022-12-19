@@ -4,9 +4,9 @@
 #SBATCH -t 0-04:00  # runtime in D-HH:MM
 #SBATCH -p small  # partition to submit to
 ##SBATCH --mem=192G  # total mem (note TACC allocates whole nodes; using this argument causes job to fail)
-#SBATCH -J snakemake
-#SBATCH -o slurm/snakemake.out
-#SBATCH -e slurm/snakemake.err
+#SBATCH -J maxbin2-2
+#SBATCH -o slurm/maxbin2-2.out
+#SBATCH -e slurm/maxbin2-2.err
 ##SBATCH --mail-type=BEGIN,END    # notifications: BEGIN,END,FAIL,ALL
 ##SBATCH --mail-user=
 
@@ -21,15 +21,4 @@
 
 source activate snakemake
 
-snakemake -j 56 --use-conda all_bowtie2_mapping
-
-# snakemake -j 56 --use-conda out/megahit/35m/final.contigs.fa
-# snakemake -j 56 --use-conda out/megahit/45m/final.contigs.fa
-# snakemake -j 56 --use-conda out/megahit/60m/final.contigs.fa
-# snakemake -j 56 --use-conda out/megahit/83m/final.contigs.fa
-# snakemake -j 56 --use-conda out/megahit/NT/final.contigs.fa
-
-# snakemake -j 8 --use-conda some_rule --forcerun upstream_rule
-
-# snakemake -j 1 --use-conda -rerun-incomplete --unlock some_rule
-# snakemake -j 8 --use-conda -rerun-incomplete some_rule
+snakemake -j 56 --use-conda out/maxbin2/45m/done
