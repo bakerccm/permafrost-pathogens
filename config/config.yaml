@@ -1,8 +1,8 @@
 sample_metadata:
-    'config/samples.tsv'
+    'metadata/samples.tsv'
 
 raw_data_dir:
-    '/work/08186/cbaker/frontera/permafrost-pathogens-data'
+    'data/fastq'
 
 # see https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/ for guidance
 # see also suggested values in post from Brian Bushnell http://seqanswers.com/forums/showthread.php?t=42776
