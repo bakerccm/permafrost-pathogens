@@ -1,6 +1,6 @@
 # ignore input and output data
 # note trailing /* is required for use with !.gitkeep
-/data/*
+/data/fastq/*
 /out/*
 
 # ignore snakemake working files
@@ -21,3 +21,4 @@
 
 # retain .gitkeep files as placeholders in otherwise empty directories
 !.gitkeep
+.Rproj.user
