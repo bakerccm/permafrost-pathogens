@@ -42,9 +42,9 @@
     # For this dataset, navigate to list of 58 SRA experiments at https://www.ncbi.nlm.nih.gov/sra?linkname=bioproject_sra_all&from_uid=542925
     # Then choose: Send to - File - Accession list
     # Downloaded file SraAccList.txt should have md5 hash dad41b5873fe3e85bf1e658f804ab54d
-    
+
     # Transfer to cluster using scp or some other approach (e.g. cut and paste in nano)
-    
+
     # Instructions below assume that the SRA accession list is saved at metadata/SraAccList.txt
 
 ################################################################################################
@@ -64,13 +64,13 @@
         cd data/fastq
 
         conda activate SRAtools # activate environment to make SRAtools available
-        
+
         # prefetch SRR15048733 # downloads a single accession
         # prefetch SRR15048735 SRR15048736 # downloads these two accessions
         prefetch $(<../../metadata/SraAccList.txt) # downloads all the accessions in the file by supplying the access numbers to the prefetch command as a space-separated list
 
         # Modify these commands as required
-        
+
         # Note that this download proceeds serially through the accession list. It could easily take 12-18 hrs to complete,
         # so detach from screen while download is taking place. The screen session should stay active for the duration.
 
@@ -86,7 +86,7 @@
         # then connect to compute node using ssh
 
     conda activate SRAtools
-    
+
     cd data/fastq
     tree
     # .
@@ -115,9 +115,9 @@
     # 2022-12-21T22:34:37 vdb-validate.2.10.0 info: Column 'SPOT_GROUP': checksums ok
     # 2022-12-21T22:34:37 vdb-validate.2.10.0 info: Database 'SRR15048733/SRR15048733.sra' contains only unaligned reads
     # 2022-12-21T22:34:37 vdb-validate.2.10.0 info: Database 'SRR15048733.sra' is consistent
-    
+
     # ... etc (similarly for all other accessions, unless of course there is a problem)
-    
+
     # note: could send output to file if you didn't want to check it on screen
 
 ################################################################################################
@@ -149,9 +149,9 @@
 # (7) Compress fastq files in parallel on a compute node
 
     ## this job takes a while and should be done in a batch job with a script something like this
-    
+
     ## not tested
-    
+
     #    #!/bin/bash
     #    #SBATCH -N 1             # request one whole node (should have 24 cores)
     #    #SBATCH -t 0-12:00       # runtime in D-HH:MM
@@ -171,7 +171,7 @@
     do
     rm ${accession}/${accession}.sra && rmdir ${accession}
     done
-    
+
     # You should now be done with the data download.
 
 ################################################################################################
@@ -195,7 +195,7 @@
     # for accession in $(<../../metadata/SraAccList.txt)
     # do
     #     echo ${accession}
-    #     # get fastq files; 6 threads is the	default
+    #     # get fastq files; 6 threads is the default
     #         fasterq-dump --threads 6 --temp . ${accession}/${accession}.sra
     #     # compress fastq files
     #         gzip ${accession}.sra_1.fastq &
@@ -205,5 +205,44 @@
     #         # rm ${accession}/${accession}.sra && rmdir ${accession}
     #    echo ${accession} complete
     # done
+
+################################################################################################
+# (9) optionally: calculate md5 hashes for downloaded (uncompressed) files to compare against saved values
+
+    # Note: it may be better to rely on vdb-validate (see above)
+    # -- it seems that the md5 hash for the uncompressed fastq data depends on the number of threads use
+    # to run fasterq-dump, presumably because using a different number of threads has the effect of
+    # reordering the fastq file (the default of 6 threads to generate the md5 sums at data/md5sums.txt)
+
+    # Nonetheless, the code is included here in case it is useful.
+
+    # Get an interactive compute session
+        salloc -p shared -t 0-02:00
+        # then connect to compute node using ssh
+
+    conda activate SRAtools
+
+    cd data/fastq
+
+    # run in serial:
+
+        rm -rf calculated_md5sums.txt # replace previous md5 sums if you have run this before
+        for fastq in *.fastq.gz
+        do
+            echo -e "${fastq%.gz}\t"`zcat ${fastq} | md5sum | awk '{print $1}'` >>calculated_md5sums.txt
+        done
+
+    # or run in parallel:
+
+        module load linuxbrew/colsa # to make gnu parallel available
+        # calculate hashes
+            ls *.fastq.gz | parallel "zcat {} | md5sum >{}.md5sum"
+        # consolidate into a single file
+            rm -rf calculated_md5sums.txt # replace previous md5 sums if you have run this before
+            for md5 in *.md5sum
+            do
+                echo -e "${md5%.gz.md5sum}\t"`cat ${md5} | awk '{print $1}'` >>calculated_md5sums.txt
+                rm ${md5}
+            done
 
 ################################################################################################

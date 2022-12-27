@@ -10,7 +10,7 @@ The data are publicly available and may be downloaded from the NCBI.
 
 `fastq` - raw data should be saved into this folder (unless a different location is specified in the [config file](/config/config.yaml)
 
-md5sums.txt - list of md5 hashes for the uncompressed fastq files
+md5sums.txt - list of md5 hashes for the uncompressed fastq files; note that these were generated with 6 threads in fasterq-dump (different thread counts will affect the md5 hash); it is probably more useful and reliable to use vdb-validate to check the integrity of the data download
 
 readme.md - is this file.
 
