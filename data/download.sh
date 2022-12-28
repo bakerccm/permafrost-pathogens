@@ -220,8 +220,6 @@
         salloc -p shared -t 0-02:00
         # then connect to compute node using ssh
 
-    conda activate SRAtools
-
     cd data/fastq
 
     # run in serial:
