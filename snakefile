@@ -64,7 +64,7 @@ rule raw_data_link:
 
 rule all_raw_qc:
     input:
-        expand('out/raw/fastqc/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'}),
+        expand('out/raw/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'}),
         'out/raw/multiqc_report.html'
 
 rule raw_fastqc:
