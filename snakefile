@@ -2,7 +2,7 @@
 
 # Chris Baker
 # https://github.com/bakerccm
-# 26 November 2021
+# 29 December 2022
 
 from snakemake.utils import min_version
 min_version("6.4.1")
@@ -60,9 +60,10 @@ rule raw_data_link:
 
 # generate fastqc quality reports for each fastq.gz file
 
-rule all_raw_fastqc:
+rule all_raw_qc:
     input:
-        expand('out/raw/fastqc/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+        expand('out/raw/fastqc/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'}),
+        'out/raw/multiqc_report.html'
 
 rule raw_fastqc:
     input:
