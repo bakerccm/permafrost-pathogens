@@ -169,7 +169,7 @@
 
     for accession in $(<SraAccList.txt)
     do
-    rm ${accession}/${accession}.sra && rmdir ${accession}
+        rm ${accession}/${accession}.sra && rmdir ${accession}
     done
 
     # You should now be done with the data download.
@@ -202,7 +202,7 @@
     #         gzip ${accession}.sra_2.fastq &
     #         wait
     #     # remove .sra files
-    #         # rm ${accession}/${accession}.sra && rmdir ${accession}
+    #         rm ${accession}/${accession}.sra && rmdir ${accession}
     #    echo ${accession} complete
     # done
 
