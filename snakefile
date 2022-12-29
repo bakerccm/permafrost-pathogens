@@ -51,8 +51,8 @@ rule raw_data_link:
         read2 = 'data/links/{sample}_R2.fastq.gz'
     shell:
         '''
-        ln -s {input.read1} {output.read1}
-        ln -s {input.read2} {output.read2}
+        ln -s ../../{input.read1} {output.read1}
+        ln -s ../../{input.read2} {output.read2}
         '''
 
 ################################
