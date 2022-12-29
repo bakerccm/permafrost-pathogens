@@ -27,8 +27,8 @@ NR!=1 {
     sample = $12
     gsub(/\./, "-", sample)
     library_name = $1
-    read1 = $1"_1.fastq.gz"
-    read2 = $1"_2.fastq.gz"
+    read1 = $1".sra_1.fastq.gz"
+    read2 = $1".sra_2.fastq.gz"
     if (sample ~ /CTRL/)
     {
         ## control samples ##
