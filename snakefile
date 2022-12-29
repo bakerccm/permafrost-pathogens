@@ -44,12 +44,14 @@ rule all_raw_data_links:
 
 rule raw_data_link:
     input:
+        # note these are specified relative to snakemake root
         read1 = lambda wildcards: RAW_DATA_DIR + "/" + METADATA.loc[wildcards.sample,'read1'],
         read2 = lambda wildcards: RAW_DATA_DIR + "/" + METADATA.loc[wildcards.sample,'read2']
     output:
         read1 = 'data/links/{sample}_R1.fastq.gz',
         read2 = 'data/links/{sample}_R2.fastq.gz'
     shell:
+        # note use of ../../ in target to ensure correct location relative to link
         '''
         ln -s ../../{input.read1} {output.read1}
         ln -s ../../{input.read2} {output.read2}

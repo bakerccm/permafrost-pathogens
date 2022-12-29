@@ -1,8 +1,8 @@
-# specify metadata folder relative to root of snakemake directory
+# specify metadata folder relative to snakemake root
 sample_metadata:
     'metadata/samples.tsv'
 
-# specify raw data folder relative to root of snakemake directory
+# specify raw data folder relative to snakemake root
 raw_data_dir:
     'data/fastq'
 
