@@ -9,7 +9,8 @@ raw_data_dir:
 # see https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/ for guidance
 # see also suggested values in post from Brian Bushnell http://seqanswers.com/forums/showthread.php?t=42776
 bbduk:
-    memory: '-Xmx3g' # restrict memory usage to 3GB (Frontera nodes have 56 cores and 192GB memory)
+    memory: '-Xmx3g' # restrict memory usage to 3GB
+    threads: 1
     adapter_trimming:
         ref: 'databases/adapters.fa' # path to copy of file from BBTools, as file is not found with conda install
         ktrim: 'r' # trim adapters from 3' end only
@@ -27,7 +28,7 @@ bbduk:
         hdist: 1 # hamming distance 1 allows up to 1 mismatch
 
 dedupe:
-    memory: '-Xmx180g' # restrict memory usage to 180GB (Frontera nodes have 56 cores and 192GB memory)
+    memory: '-Xmx180g' # restrict memory usage to 180GB
 
 fastq-join:
     max_percent_difference: 8 # default: 8

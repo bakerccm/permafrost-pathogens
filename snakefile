@@ -118,7 +118,7 @@ rule bbduk:
         'out/bbduk/{sample}.log'
     conda:
         'envs/bbtools.yaml'
-    threads: 1
+    threads: config['bbduk']['threads']
     shell:
         '''
         bbduk.sh {params.memory} threads={threads} \
