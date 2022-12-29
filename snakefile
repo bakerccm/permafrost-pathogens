@@ -2,7 +2,7 @@
 
 # Chris Baker
 # https://github.com/bakerccm
-# 29 December 2022
+# 26 November 2021
 
 from snakemake.utils import min_version
 min_version("6.4.1")
@@ -38,16 +38,35 @@ rule all:
         expand('out/metaquast/{assembly}/report.txt', assembly = {'35m','45m', '60m', '83m', 'NT'})
 
 ################################
+rule all_raw_data_links:
+    input:
+        expand('data/links/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'})
+
+rule raw_data_link:
+    input:
+        read1 = lambda wildcards: RAW_DATA_DIR + "/" + METADATA.loc[wildcards.sample,'read1'],
+        read2 = lambda wildcards: RAW_DATA_DIR + "/" + METADATA.loc[wildcards.sample,'read2']
+    output:
+        read1 = 'data/links/{sample}_R1.fastq.gz',
+        read2 = 'data/links/{sample}_R2.fastq.gz'
+    shell:
+        '''
+        ln -s {input.read1} {output.read1}
+        ln -s {input.read2} {output.read2}
+        '''
+
+################################
 ## QC for raw data files
 
-rule all_raw_qc:
+# generate fastqc quality reports for each fastq.gz file
+
+rule all_raw_fastqc:
     input:
-        expand('out/raw/fastqc/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'}),
-        'out/raw/multiqc_report.html'
+        expand('out/raw/fastqc/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
 
 rule raw_fastqc:
     input:
-        RAW_DATA_DIR + '/' + '{sample}_{read}.fastq.gz'
+        'data/links/{sample}_{read}.fastq.gz'
     output:
         'out/raw/{sample}_{read}_fastqc.html',
         'out/raw/{sample}_{read}_fastqc.zip'
@@ -75,8 +94,8 @@ rule raw_multiQC:
 # see bbduk overview here http://seqanswers.com/forums/showthread.php?t=42776
 rule bbduk:
     input:
-        read1 = RAW_DATA_DIR + '/' + '{sample}_R1.fastq.gz',
-        read2 = RAW_DATA_DIR + '/' + '{sample}_R2.fastq.gz'
+        read1 = 'data/links/{sample}_R1.fastq.gz',
+        read2 = 'data/links/{sample}_R2.fastq.gz'
     output:
         read1 = temp('out/bbduk/{sample}_R1.fastq.gz'),
         read2 = temp('out/bbduk/{sample}_R2.fastq.gz'),
@@ -406,8 +425,8 @@ rule all_singlem:
 
 rule singlem:
     input:
-        read1 = RAW_DATA_DIR + '/' + '{sample}_R1.fastq.gz', # may want to use adapter-filtered reads instead; manual suggests not quality filtering since it can make the reads too short
-        read2 = RAW_DATA_DIR + '/' + '{sample}_R2.fastq.gz'
+        read1 = 'data/links/{sample}_R1.fastq.gz', # may want to use adapter-filtered reads instead; manual suggests not quality filtering since it can make the reads too short
+        read2 = 'data/links/{sample}_R2.fastq.gz'
     output:
         'out/singlem/{sample}.otu_table.tsv'
     conda:
