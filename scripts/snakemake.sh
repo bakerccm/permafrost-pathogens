@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH -N 1  # nodes
-#SBATCH -n 56  # cores (note TACC allocates whole nodes)
+#SBATCH -n 56  # cores
 #SBATCH -t 0-04:00  # runtime in D-HH:MM
-#SBATCH -p small  # partition to submit to
-##SBATCH --mem=192G  # total mem (note TACC allocates whole nodes; using this argument causes job to fail)
+#SBATCH -p shared  # partition to submit to
+##SBATCH --mem=192G  # total mem
 #SBATCH -J snakemake
 #SBATCH -o slurm/snakemake.out
 #SBATCH -e slurm/snakemake.err
@@ -21,7 +21,7 @@
 
 source activate snakemake
 
-snakemake -j 56 --use-conda all_bowtie2_mapping
+snakemake -j 56 --use-conda bbduk_multiQC
 
 # snakemake -j 56 --use-conda out/megahit/35m/final.contigs.fa
 # snakemake -j 56 --use-conda out/megahit/45m/final.contigs.fa
