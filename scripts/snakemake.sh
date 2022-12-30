@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -N 1  # nodes
-#SBATCH -n 56  # cores
-#SBATCH -t 0-04:00  # runtime in D-HH:MM
+#SBATCH -n 24  # cores
+#SBATCH -t 0-02:00  # runtime in D-HH:MM
 #SBATCH -p shared  # partition to submit to
 ##SBATCH --mem=192G  # total mem
 #SBATCH -J snakemake
@@ -21,7 +21,7 @@
 
 source activate snakemake
 
-snakemake -j 56 --use-conda bbduk_multiQC
+snakemake -j 24 --use-conda bbduk_noPhiX_multiQC
 
 # snakemake -j 56 --use-conda out/megahit/35m/final.contigs.fa
 # snakemake -j 56 --use-conda out/megahit/45m/final.contigs.fa
