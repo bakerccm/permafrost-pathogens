@@ -91,7 +91,7 @@ rule raw_multiQC:
     conda:
         'envs/multiqc.yaml'
     shell:
-        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
+        'multiqc --interactive -f -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
 # see bbduk overview here http://seqanswers.com/forums/showthread.php?t=42776
@@ -153,7 +153,7 @@ rule bbduk_multiQC:
     conda:
         'envs/multiqc.yaml'
     shell:
-        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
+        'multiqc --interactive -f -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
 
@@ -208,7 +208,7 @@ rule bbduk_noPhiX_multiQC:
     conda:
         'envs/multiqc.yaml'
     shell:
-        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
+        'multiqc --interactive -f -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
 # deduplicate using FastUniq
@@ -284,7 +284,7 @@ rule fastuniq_multiQC:
     conda:
         'envs/multiqc.yaml'
     shell:
-        'multiqc --interactive -o {params.outputdir} {params.inputdir} 2>{log}'
+        'multiqc --interactive -f -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
 # megahit co-assembly
