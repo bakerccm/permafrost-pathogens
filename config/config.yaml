@@ -28,7 +28,7 @@ bbduk:
         hdist: 1 # hamming distance 1 allows up to 1 mismatch
 
 fastuniq:
-    threads: 12
+    threads: 6
     
 megahit:
     threads: 56
