@@ -118,7 +118,8 @@ rule bbduk:
         'out/bbduk/{sample}.log'
     conda:
         'envs/bbtools.yaml'
-    threads: config['bbduk']['threads']
+    threads:
+        config['bbduk']['threads']
     shell:
         '''
         bbduk.sh {params.memory} threads={threads} \
@@ -174,7 +175,8 @@ rule bbduk_noPhiX:
         'out/bbduk_noPhiX/{sample}.log'
     conda:
         'envs/bbtools.yaml'
-    threads: 1
+    threads:
+        config['bbduk']['threads']
     shell:
         '''
         bbduk.sh {params.memory} threads={threads} \
@@ -241,7 +243,8 @@ rule fastuniq:
         filelist_name = 'out/bbduk_noPhiX_fastuniq/{sample}_input_filelist.txt'
     conda:
         'envs/fastuniq.yaml'
-    threads: 28
+    threads:
+        config['fastuniq']['threads']
     shell:
         '''
         # save input file names to file
@@ -307,7 +310,8 @@ rule megahit_coassembly:
         output_dir = "out/megahit/{assembly}"
     log:
         "out/megahit/{assembly}.log"
-    threads: 56
+    threads:
+        config['megahit']['threads']
     conda:
         'envs/megahit.yaml'
     shell:
@@ -341,7 +345,8 @@ rule megahit_metaquast:
         "out/metaquast/{assembly}/report.txt" # there are several other output files in this directory too
     params:
         output_dir = "out/metaquast/{assembly}"
-    threads: 4
+    threads:
+        config['metaquast']['threads']
     conda:
         'envs/quast.yaml'
     shell:
@@ -393,7 +398,8 @@ rule phyloflash:
         output_dir = 'out/phyloflash',
         readlength = 100,
         dbhome_dir = 'databases/phyloflash/138.1'
-    threads: 8
+    threads:
+        config['phyloflash']['threads']
     conda:
         'envs/phyloflash.yaml'
     shell:
@@ -435,7 +441,7 @@ rule singlem:
     conda:
         'envs/singlem.yaml'
     threads:
-        8
+        config['singlem']['pipe']['threads']
     shell:
         '''
         singlem pipe --forward {input.read1} --reverse {input.read2} \
@@ -499,7 +505,8 @@ rule bowtie2_mapping:
         bt2_index = 'out/megahit/{assembly}/bowtie2_index' # file path stem for bowtie2 index
     conda:
         'envs/bowtie2.yaml'
-    threads: 8
+    threads:
+        config['bowtie2']['threads']
     shell:
         '''
         bowtie2 -1 {input.read1} -2 {input.read2} -q \
@@ -563,7 +570,8 @@ rule maxbin2:
         output_file_header = 'out/maxbin2/{assembly}/{assembly}'
     conda:
         'envs/maxbin2.yaml'
-    threads: 16
+    threads:
+        config['maxbin2']['threads']
     shell:
         '''
         # get file names and store as array
@@ -610,7 +618,7 @@ rule checkm:
     conda:
         'envs/checkm.yaml'
     threads:
-        16
+        config['checkm']['threads']
     shell:
         '''
         # set database directory
@@ -687,7 +695,8 @@ rule rgi:
         'out/maxbin2_rgi/35m/35m.001.txt'
     conda:
         'envs/rgi.yaml'
-    threads: 32
+    threads:
+        config['rgi']['threads']
     shell:
         '''
         rgi main --input_sequence {input} \

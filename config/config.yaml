@@ -27,9 +27,30 @@ bbduk:
         k: 31 # kmer size
         hdist: 1 # hamming distance 1 allows up to 1 mismatch
 
-dedupe:
-    memory: '-Xmx180g' # restrict memory usage to 180GB
+fastuniq:
+    threads: 12
+    
+megahit:
+    threads: 56
 
-fastq-join:
-    max_percent_difference: 8 # default: 8
-    min_overlap: 6 # default: 6
+metaquast:
+    threads: 4
+
+phyloflash:
+    threads: 8
+
+singlem:
+    pipe:
+        threads: 8
+
+bowtie2:
+    threads: 8
+
+maxbin2:
+    threads: 16
+
+checkm:
+    threads: 16
+
+rgi:
+    threads: 32
