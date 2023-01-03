@@ -30,12 +30,23 @@ ALL_SAMPLES = list(METADATA.index)
 GOOD_SAMPLES = list(METADATA[METADATA.co_assembly != "NA"].index) # samples shown as "." in the co_assembly column are controls or poor quality --> exclude from assemblies
 
 ################################
-# default rules
+# default rule
 
 rule all:
     input:
-        'out/raw/multiqc_report.html', 'out/bbduk/multiqc_report.html', 'out/bbduk_noPhiX/multiqc_report.html', 'out/bbduk_noPhiX_fastuniq/multiqc_report.html',
-        expand('out/metaquast/{assembly}/report.txt', assembly = {'35m','45m', '60m', '83m', 'NT'})
+        'out/raw/multiqc_report.html'
+        expand('out/singlem/{sample}.otu_table.tsv', sample = GOOD_SAMPLES),
+        'out/bbduk/multiqc_report.html',
+        'out/bbduk_noPhiX/multiqc_report.html',
+        'out/bbduk_noPhiX_fastuniq/multiqc_report.html',
+        expand('out/phyloflash/{sample}.phyloFlash.tar.gz', sample = GOOD_SAMPLES),
+        expand('out/metaquast/{assembly}/report.txt', assembly = {'35m','45m', '60m', '83m', 'NT'}),
+        expand('out/maxbin2/{assembly}/done', assembly = {'35m','45m', '60m', '83m', 'NT'}),
+        expand('out/maxbin2_checkm/{assembly}.txt', assembly = {'35m','45m', '60m', '83m', 'NT'}),
+        # expand these to all assemblies and bins later
+            'out/maxbin2_prokka/35m/35m.001',
+            'out/maxbin2_staramr/35m/35m.001',
+            'out/maxbin2_rgi/35m/35m.001.txt'
 
 ################################
 ## make links to raw data files (note: renames files to reflect sample labels)
@@ -64,7 +75,6 @@ rule raw_data_link:
 
 rule all_raw_qc:
     input:
-        expand('out/raw/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'}),
         'out/raw/multiqc_report.html'
 
 rule raw_fastqc:
@@ -368,18 +378,19 @@ rule megahit_metaquast:
         'metaquast.py -o {params.output_dir} -t {threads} --max-ref-number 0 {input}'
 
 ################################
-    # this rule fails with errors messages about missing contextvars and missing django
-rule reformat_megahit_contigs:
-    input:
-        "out/megahit/{assembly}/final.contigs.fa"
-    output:
-        "out/megahit/{assembly}/contigs.fa"
-    params:
-        min_length = 1000
-    conda:
-        'envs/anvio-minimal.yaml'
-    shell:
-        'anvi-script-reformat-fasta {input} -o {output} -l {params.min_length} --simplify-names'
+# this rule fails with errors messages about missing contextvars and missing django
+
+# rule reformat_megahit_contigs:
+#     input:
+#         "out/megahit/{assembly}/final.contigs.fa"
+#     output:
+#         "out/megahit/{assembly}/contigs.fa"
+#     params:
+#         min_length = 1000
+#     conda:
+#         'envs/anvio-minimal.yaml'
+#     shell:
+#         'anvi-script-reformat-fasta {input} -o {output} -l {params.min_length} --simplify-names'
 
 ################################
 # use phyloflash to do some SSU-based analysis
