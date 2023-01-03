@@ -609,6 +609,7 @@ rule maxbin2:
 
 rule checkm:
     input:
+        # note this needs to be updated -- the folder will be created by rule maxbin2 but it is not specified as output of that rule
         'out/maxbin2/{assembly}' # maxbin2 output folder
     output:
         dir = directory('out/maxbin2_checkm/{assembly}'), # checkm output folder
