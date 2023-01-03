@@ -106,8 +106,7 @@ rule raw_multiQC:
 ################################
 ## run rules bbduk, bbduk_noPhiX and fastuniq, plus QC for each step
 
-# note: these rules should be run together because the outputs of bbduk and bbduk_noPhiX are temp()
-# to conserve storage and will need to be generated again if needed later
+# note: these rules should be run together like this if the outputs of bbduk and bbduk_noPhiX are temp()
 
 rule bbduk_fastuniq_all:
     input:
@@ -124,8 +123,12 @@ rule bbduk:
         read1 = 'data/links/{sample}_R1.fastq.gz',
         read2 = 'data/links/{sample}_R2.fastq.gz'
     output:
-        read1 = temp('out/bbduk/{sample}_R1.fastq.gz'),
-        read2 = temp('out/bbduk/{sample}_R2.fastq.gz'),
+        # consider making these temp() but only if it is possible to run bbduk,
+        # bbduk_noPhiX and fastuniq (plus QC) together in a single job
+        #    read1 = temp('out/bbduk/{sample}_R1.fastq.gz'),
+        #    read2 = temp('out/bbduk/{sample}_R2.fastq.gz'),
+        read1 = 'out/bbduk/{sample}_R1.fastq.gz',
+        read2 = 'out/bbduk/{sample}_R2.fastq.gz',
         stats = 'out/bbduk/{sample}_stats.txt'
     params:
         memory = config['bbduk']['memory'],
@@ -188,8 +191,12 @@ rule bbduk_noPhiX:
         read1 = 'out/bbduk/{sample}_R1.fastq.gz',
         read2 = 'out/bbduk/{sample}_R2.fastq.gz'
     output:
-        read1_unmatched = temp('out/bbduk_noPhiX/{sample}_unmatched_R1.fastq.gz'), # unmatched reads are not PhiX
-        read2_unmatched = temp('out/bbduk_noPhiX/{sample}_unmatched_R2.fastq.gz'),
+        # consider making these temp() but only if it is possible to run bbduk,
+        # bbduk_noPhiX and fastuniq (plus QC) together in a single job
+        #    read1_unmatched = temp('out/bbduk_noPhiX/{sample}_unmatched_R1.fastq.gz'), # unmatched reads are not PhiX
+        #    read2_unmatched = temp('out/bbduk_noPhiX/{sample}_unmatched_R2.fastq.gz'),
+        read1_unmatched = 'out/bbduk_noPhiX/{sample}_unmatched_R1.fastq.gz', # unmatched reads are not PhiX
+        read2_unmatched = 'out/bbduk_noPhiX/{sample}_unmatched_R2.fastq.gz',
         stats = 'out/bbduk_noPhiX/{sample}_stats.txt'
     params:
         memory = config['bbduk']['memory'],
