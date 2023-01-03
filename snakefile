@@ -38,6 +38,8 @@ rule all:
         expand('out/metaquast/{assembly}/report.txt', assembly = {'35m','45m', '60m', '83m', 'NT'})
 
 ################################
+## make links to raw data files (note: renames files to reflect sample labels)
+
 rule all_raw_data_links:
     input:
         expand('data/links/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {'R1','R2'})
@@ -58,9 +60,7 @@ rule raw_data_link:
         '''
 
 ################################
-## QC for raw data files
-
-# generate fastqc quality reports for each fastq.gz file
+## qc for raw data files
 
 rule all_raw_qc:
     input:
@@ -94,6 +94,20 @@ rule raw_multiQC:
         'multiqc --interactive -f -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
+## run rules bbduk, bbduk_noPhiX and fastuniq, plus QC for each step
+
+# note: these rules should be run together because the outputs of bbduk and bbduk_noPhiX are temp()
+# to conserve storage and will need to be generated again if needed later
+
+rule bbduk_fastuniq_all:
+    input:
+        "out/bbduk/multiqc_report.html",
+        "out/bbduk_noPhiX/multiqc_report.html",
+        "out/bbduk_noPhiX_fastuniq/multiqc_report.html"
+
+################################
+## trim adapters etc using bbduk
+
 # see bbduk overview here http://seqanswers.com/forums/showthread.php?t=42776
 rule bbduk:
     input:
@@ -157,6 +171,7 @@ rule bbduk_multiQC:
         'multiqc --interactive -f -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
+## remove any residual PhiX using bbduk
 
 rule bbduk_noPhiX:
     input:
@@ -218,10 +233,6 @@ rule bbduk_noPhiX_multiQC:
 # commands for testing
 # snakemake --use-conda --rerun-incomplete -j 16 out/bbduk_noPhiX_fastuniq/35m-t0-R2_{R1,R2}.fastq.gz
 # snakemake --use-conda --rerun-incomplete -j 56 -np fastuniq_all
-
-rule fastuniq_all:
-    input:
-        expand('out/bbduk_noPhiX_fastuniq/{sample}_{read}.fastq.gz', sample = ALL_SAMPLES, read = {"R1","R2"})
 
 rule fastuniq_decompress_inputs:
     input:
