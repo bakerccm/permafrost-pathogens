@@ -35,7 +35,7 @@ GOOD_SAMPLES = list(METADATA[METADATA.co_assembly != "NA"].index) # samples show
 rule all:
     input:
         'out/raw/multiqc_report.html',
-        expand('out/singlem/{sample}.otu_table.tsv', sample = GOOD_SAMPLES),
+        'out/singlem/all_good_samples.otu_table.tsv',
         'out/bbduk/multiqc_report.html',
         'out/bbduk_noPhiX/multiqc_report.html',
         'out/bbduk_noPhiX_fastuniq/multiqc_report.html',
