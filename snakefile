@@ -638,12 +638,12 @@ rule maxbin2:
 
 rule checkm:
     input:
-        # note this needs to be updated -- the folder will be created by rule maxbin2 but it is not specified as output of that rule
-        'out/maxbin2/{assembly}' # maxbin2 output folder
+        'out/maxbin2/{assembly}/done'
     output:
         dir = directory('out/maxbin2_checkm/{assembly}'), # checkm output folder
         file = 'out/maxbin2_checkm/{assembly}.txt'
     params:
+        input_dir = 'out/maxbin2/{assembly}',
         database_dir = 'databases/checkm'
     conda:
         'envs/checkm.yaml'
@@ -655,7 +655,7 @@ rule checkm:
             checkm data setRoot {params.database_dir}
         # run checkm
         # note fasta extension is specified here - updated if using a different binning program
-            checkm lineage_wf -t {threads} -x fasta {input} -f {output.file} {output.dir}
+            checkm lineage_wf -t {threads} -x fasta {params.input_dir} -f {output.file} {output.dir}
         '''
 
 # checkm lineage_wf runs the four mandatory steps of the lineage-specific workflow:
@@ -679,32 +679,35 @@ rule checkm:
 # snakemake -j 56 --use-conda out/maxbin2_prokka/NT/NT.{001..096} # working on it
 rule prokka:
     input:
-        'out/maxbin2/{assembly}/{bin}.fasta'
+        # note sure how to specify fasta(s) as output of maxbin2 rule since number of bins is not predefined
+        # 'out/maxbin2/{assembly}/{bin}.fasta'
+        'out/maxbin2/{assembly}/done'
     output:
         directory('out/maxbin2_prokka/{assembly}/{bin}') # maybe alter this once we know what output files look like
     params:
-        out = 'databases/checkm'
+        input_fasta = 'out/maxbin2/{assembly}/{bin}.fasta'
+        # ?? out = 'databases/checkm'
     conda:
         'envs/prokka.yaml'
     shell:
         '''
-        prokka --outdir {output} --prefix {wildcards.bin} {input}
+        prokka --outdir {output} --prefix {wildcards.bin} {params.input_fasta}
         '''
 
 ################################
 
 rule staramr:
     input:
-        #'out/maxbin2/{assembly}/{bin}.fasta'
-        'out/maxbin2/35m/35m.001.fasta'
+        'out/maxbin2/{assembly}/done'
     output:
-        #directory('out/maxbin2_staramr/{assembly}/{bin}') # maybe alter this once we know what output files look like
-        directory('out/maxbin2_staramr/35m/35m.001')
+        directory('out/maxbin2_staramr/{assembly}/{bin}')
+    params:
+        input_fasta = 'out/maxbin2/{assembly}/{bin}.fasta'
     conda:
         'envs/staramr.yaml'
     shell:
         '''
-        staramr search -o {output} {input}
+        staramr search -o {output} {params.input_fasta}
         '''
 
 ################################
@@ -719,17 +722,18 @@ rule staramr:
 
 rule rgi:
     input:
-        #'out/maxbin2/{assembly}/{bin}.fasta'
-        'out/maxbin2/35m/35m.001.fasta'
+        'out/maxbin2/{assembly}/done'
     output:
-        'out/maxbin2_rgi/35m/35m.001.txt'
+        'out/maxbin2_rgi/{assembly}/{bin}.txt'
+    params:
+        input_fasta = 'out/maxbin2/{assembly}/{bin}.fasta'
     conda:
         'envs/rgi.yaml'
     threads:
         config['rgi']['threads']
     shell:
         '''
-        rgi main --input_sequence {input} \
+        rgi main --input_sequence {params.input_fasta} \
           --output_file {output} --input_type contig --local \
           --low_quality --include_loose --clean --num_threads {threads} --split_prodigal_jobs
         '''
