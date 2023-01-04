@@ -39,7 +39,7 @@ rule all:
         'out/bbduk/multiqc_report.html',
         'out/bbduk_noPhiX/multiqc_report.html',
         'out/bbduk_noPhiX_fastuniq/multiqc_report.html',
-        expand('out/phyloflash/{sample}.phyloFlash.tar.gz', sample = GOOD_SAMPLES),
+        'out/phyloflash/all_good_samples.phyloFlash_compare.barplot.pdf',
         expand('out/metaquast/{assembly}/report.txt', assembly = {'35m','45m', '60m', '83m', 'NT'}),
         expand('out/maxbin2/{assembly}/done', assembly = {'35m','45m', '60m', '83m', 'NT'}),
         expand('out/maxbin2_checkm/{assembly}.txt', assembly = {'35m','45m', '60m', '83m', 'NT'}),
