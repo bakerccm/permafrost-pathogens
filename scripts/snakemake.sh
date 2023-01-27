@@ -9,6 +9,7 @@
 #SBATCH -e slurm/snakemake.err
 ##SBATCH --mail-type=BEGIN,END    # notifications: BEGIN,END,FAIL,ALL
 ##SBATCH --mail-user=
+#SBATCH --gres=gpu:1
 
 ##SBATCH --dependency=after:jobid[:jobid...] # job can begin after specified jobs have started
 ##SBATCH --dependency=afterany:jobid[:jobid...] # job can begin after specified jobs have terminated
@@ -21,7 +22,7 @@
 
 source activate snakemake
 
-snakemake -j 24 --use-conda bbduk_noPhiX_multiQC
+snakemake -j 24 --use-conda out/megahit/35m/final.contigs.fa
 
 # snakemake -j 56 --use-conda out/megahit/35m/final.contigs.fa
 # snakemake -j 56 --use-conda out/megahit/45m/final.contigs.fa
