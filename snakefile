@@ -363,7 +363,7 @@ rule megahit_coassembly:
             rm -rf {params.output_dir}
 
         # megahit -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -t {threads} -o {params.output_dir}
-        megahit -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -o {params.output_dir} --use-gpu
+        megahit -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -t {threads} -o {params.output_dir} --use-gpu
         '''
 
 # takes 5 min to run without gene finding
