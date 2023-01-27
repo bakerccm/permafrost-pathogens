@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH -N 1  # nodes
-#SBATCH -n 24  # cores
-#SBATCH -t 0-02:00  # runtime in D-HH:MM
+#SBATCH -N 2  # nodes
+#SBATCH -n 48  # cores
+#SBATCH -t 2-00:00  # runtime in D-HH:MM
 #SBATCH -p shared  # partition to submit to
 ##SBATCH --mem=192G  # total mem
 #SBATCH -J snakemake
@@ -9,7 +9,7 @@
 #SBATCH -e slurm/snakemake.err
 ##SBATCH --mail-type=BEGIN,END    # notifications: BEGIN,END,FAIL,ALL
 ##SBATCH --mail-user=
-#SBATCH --gres=gpu:1
+##SBATCH --gres=gpu:1
 
 ##SBATCH --dependency=after:jobid[:jobid...] # job can begin after specified jobs have started
 ##SBATCH --dependency=afterany:jobid[:jobid...] # job can begin after specified jobs have terminated
@@ -22,7 +22,8 @@
 
 source activate snakemake
 
-snakemake -j 24 --use-conda out/megahit/35m/final.contigs.fa
+snakemake -j 48 --use-conda --rerun-incomplete --unlock out/megahit/{35m,45m,60m,83m,NT}/final.contigs.fa
+snakemake -j 48 --use-conda --rerun-incomplete out/megahit/{35m,45m,60m,83m,NT}/final.contigs.fa
 
 # snakemake -j 56 --use-conda out/megahit/35m/final.contigs.fa
 # snakemake -j 56 --use-conda out/megahit/45m/final.contigs.fa
