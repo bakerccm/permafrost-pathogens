@@ -9,7 +9,7 @@
 #SBATCH -e slurm/snakemake.err
 ##SBATCH --mail-type=BEGIN,END    # notifications: BEGIN,END,FAIL,ALL
 ##SBATCH --mail-user=
-##SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:1
 
 ##SBATCH --dependency=after:jobid[:jobid...] # job can begin after specified jobs have started
 ##SBATCH --dependency=afterany:jobid[:jobid...] # job can begin after specified jobs have terminated
