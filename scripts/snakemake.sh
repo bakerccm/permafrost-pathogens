@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -N 1  # nodes
-#SBATCH -n 24  # cores
+#SBATCH -n 32  # cores
 #SBATCH -t 4-00:00  # runtime in D-HH:MM
 #SBATCH -p shared  # partition to submit to
 ##SBATCH --mem=192G  # total mem
@@ -22,8 +22,8 @@
 
 source activate snakemake
 
-snakemake -j 24 --use-conda --rerun-incomplete --unlock out/megahit/{35m,83m}/final.contigs.fa
-snakemake -j 24 --use-conda --rerun-incomplete out/megahit/{35m,83m}/final.contigs.fa
+snakemake -j 32 --use-conda --rerun-incomplete --unlock out/megahit/{35m,83m}/final.contigs.fa
+snakemake -j 32 --use-conda --rerun-incomplete out/megahit/{35m,83m}/final.contigs.fa
 
 # snakemake -j 56 --use-conda out/megahit/35m/final.contigs.fa
 # snakemake -j 56 --use-conda out/megahit/45m/final.contigs.fa
