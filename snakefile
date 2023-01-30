@@ -327,7 +327,6 @@ rule fastuniq_multiQC:
 #   60m: 08:35:44
 #   83m: 05:29:18
 #   NT : 10:20:45
-# N.B. MEGAHIT can optionally utilize a CUDA-enabled GPU to accelerate its SdBG contstruction.
 rule megahit_coassembly:
     input:
         read1 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R1.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
@@ -362,8 +361,7 @@ rule megahit_coassembly:
         # remove output directory (megahit will fail if already exists)
             rm -rf {params.output_dir}
 
-        # megahit -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -t {threads} -o {params.output_dir}
-        megahit -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -t {threads} -o {params.output_dir} --use-gpu
+        megahit -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -t {threads} -o {params.output_dir}
         '''
 
 # takes 5 min to run without gene finding
