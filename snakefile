@@ -320,7 +320,7 @@ rule fastuniq_multiQC:
 ################################
 # megahit co-assembly
 
-# co-assembles samples excluding failed samples, according to co-assembly column in samples.tsv metadata file
+# co-assembles samples excluding failed samples, according to co_assembly column in samples.tsv metadata file
 # runtimes:
 #   35m: 04:02:15
 #   45m: 07:22:25
