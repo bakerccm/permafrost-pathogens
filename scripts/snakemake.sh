@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH -N 1  # nodes
-#SBATCH -n 32  # cores
-#SBATCH -t 4-00:00  # runtime in D-HH:MM
+#SBATCH -n 40  # cores
+#SBATCH -t 7-00:00  # runtime in D-HH:MM
 #SBATCH -p shared  # partition to submit to
-##SBATCH --mem=192G  # total mem
-#SBATCH -J snakemake_002
-#SBATCH -o slurm/snakemake_002.out
-#SBATCH -e slurm/snakemake_002.err
+##SBATCH --mem=500G  # total mem
+#SBATCH -J snakemake_003
+#SBATCH -o slurm/snakemake_003.out
+#SBATCH -e slurm/snakemake_003.err
 ##SBATCH --mail-type=BEGIN,END    # notifications: BEGIN,END,FAIL,ALL
 ##SBATCH --mail-user=
 
@@ -21,8 +21,8 @@
 
 source activate snakemake
 
-snakemake -j 32 --use-conda --rerun-incomplete --unlock out/megahit/{35m,83m}/final.contigs.fa
-snakemake -j 32 --use-conda --rerun-incomplete out/megahit/{35m,83m}/final.contigs.fa
+snakemake -j 40 --use-conda --rerun-incomplete --unlock out/megahit/35m/final.contigs.fa
+snakemake -j 40 --use-conda --rerun-incomplete out/megahit/35m/final.contigs.fa
 
 # snakemake -j 56 --use-conda out/megahit/35m/final.contigs.fa
 # snakemake -j 56 --use-conda out/megahit/45m/final.contigs.fa
