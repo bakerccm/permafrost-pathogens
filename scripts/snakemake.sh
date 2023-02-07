@@ -3,7 +3,7 @@
 #SBATCH -n 64  # cores
 #SBATCH -t 7-00:00  # runtime in D-HH:MM
 #SBATCH -p shared  # partition to submit to
-#SBATCH --mem=1000G  # total mem
+#SBATCH --mem=950G  # total mem
 #SBATCH -J snakemake_003
 #SBATCH -o slurm/snakemake_003.out
 #SBATCH -e slurm/snakemake_003.err
