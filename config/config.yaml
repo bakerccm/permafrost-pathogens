@@ -31,7 +31,7 @@ fastuniq:
     threads: 6
     
 megahit:
-    threads: 64
+    threads: 40
 
 metaquast:
     threads: 4

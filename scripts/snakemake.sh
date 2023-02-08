@@ -21,8 +21,8 @@
 
 source activate snakemake-6.4.1
 
-snakemake -j 64 --use-conda --rerun-incomplete --unlock out/megahit/35m/final.contigs.fa
-snakemake -j 64 --use-conda --rerun-incomplete out/megahit/35m/final.contigs.fa
+snakemake -j 40 --use-conda --rerun-incomplete --unlock out/megahit/35m/final.contigs.fa
+snakemake -j 40 --use-conda --rerun-incomplete out/megahit/35m/final.contigs.fa
 
 # snakemake -j 56 --use-conda out/megahit/35m/final.contigs.fa
 # snakemake -j 56 --use-conda out/megahit/45m/final.contigs.fa
