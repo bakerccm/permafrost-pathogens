@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -N 1  # nodes
-#SBATCH -n 64  # cores
+#SBATCH -n 40  # cores
 #SBATCH -t 7-00:00  # runtime in D-HH:MM
 #SBATCH -p shared  # partition to submit to
 #SBATCH --mem=950G  # total mem
