@@ -19,9 +19,9 @@
 # note use of conda activate (preferred over source activate from conda v4.4 onwards)
 # conda activate snakemake
 
-source activate snakemake
+source activate snakemake-6.4.1
 
-# snakemake -j 64 --use-conda --rerun-incomplete --unlock out/megahit/35m/final.contigs.fa
+snakemake -j 64 --use-conda --rerun-incomplete --unlock out/megahit/35m/final.contigs.fa
 snakemake -j 64 --use-conda --rerun-incomplete out/megahit/35m/final.contigs.fa
 
 # snakemake -j 56 --use-conda out/megahit/35m/final.contigs.fa
