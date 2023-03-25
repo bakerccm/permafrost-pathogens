@@ -4,7 +4,7 @@
 #SBATCH -t 3-00:00  # runtime in D-HH:MM
 #SBATCH -p shared  # partition to submit to
 #SBATCH --mem=950G  # total mem
-#SBATCH --nodelist=node117,node118 # comma separated list of node names to use`
+#SBATCH --nodelist=node117 # comma separated list of node names to use`
 #SBATCH -J snakemake
 #SBATCH -o slurm/snakemake.out
 #SBATCH -e slurm/snakemake.err
