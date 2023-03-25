@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH -N 2  # nodes
-#SBATCH -n 48  # cores - many cores have 24 cores on Premise
-#SBATCH -t 5-00:00  # runtime in D-HH:MM
+#SBATCH -N 1  # nodes
+#SBATCH -n 64  # cores - many cores have 24 cores on Premise but some have more
+#SBATCH -t 3-00:00  # runtime in D-HH:MM
 #SBATCH -p shared  # partition to submit to
 #SBATCH --mem=950G  # total mem
-##SBATCH --nodelist=  # comma separated list of node names to use`
+#SBATCH --nodelist=node117,node118 # comma separated list of node names to use`
 #SBATCH -J snakemake
 #SBATCH -o slurm/snakemake.out
 #SBATCH -e slurm/snakemake.err
@@ -22,8 +22,8 @@
 
 source activate snakemake-6.4.1
 
-snakemake -j 48 --use-conda --rerun-incomplete --unlock out/megahit/{35m,45m,60m,83m,NT}/final.contigs.fa
-snakemake -j 48 --use-conda --rerun-incomplete out/megahit/{35m,45m,60m,83m,NT}/final.contigs.fa
+snakemake -j 64 --use-conda --rerun-incomplete --unlock out/megahit/{35m,45m,60m,83m,NT}/final.contigs.fa
+snakemake -j 64 --use-conda --rerun-incomplete out/megahit/{35m,45m,60m,83m,NT}/final.contigs.fa
 
 # snakemake -j 56 --use-conda out/megahit/35m/final.contigs.fa
 # snakemake -j 56 --use-conda out/megahit/45m/final.contigs.fa
