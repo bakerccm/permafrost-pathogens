@@ -5,8 +5,8 @@
 #SBATCH -p small  # partition to submit to
 ##SBATCH --mem=192G  # total mem (note TACC allocates whole nodes; using this argument causes job to fail)
 #SBATCH -J maxbin2-2
-#SBATCH -o slurm/maxbin2-2.out
-#SBATCH -e slurm/maxbin2-2.err
+#SBATCH -o slurm/maxbin2-%j.out
+#SBATCH -e slurm/maxbin2-%j.err
 ##SBATCH --mail-type=BEGIN,END    # notifications: BEGIN,END,FAIL,ALL
 ##SBATCH --mail-user=
 
@@ -22,3 +22,7 @@
 source activate snakemake
 
 snakemake -j 56 --use-conda out/maxbin2/45m/done
+
+sleep 5
+sacct -j $SLURM_JOBID --format=JobID,JobName%24,CPUTime,Elapsed,MaxRSS --units=G
+

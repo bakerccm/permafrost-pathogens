@@ -5,8 +5,8 @@
 #SBATCH -p small  # partition to submit to
 ##SBATCH --mem=192G  # total mem (note TACC allocates whole nodes; using this argument causes job to fail)
 #SBATCH -J centrifuge_make_db
-#SBATCH -o slurm/centrifuge_make_db.out
-#SBATCH -e slurm/centrifuge_make_db.err
+#SBATCH -o slurm/centrifuge_make_db-%j.out
+#SBATCH -e slurm/centrifuge_make_db-%j.err
 ##SBATCH --mail-type=BEGIN,END    # notifications: BEGIN,END,FAIL,ALL
 ##SBATCH --mail-user=
 ##SBATCH --dependency=after:jobid[:jobid...] job can begin after specified jobs have started
@@ -21,3 +21,7 @@ source activate centrifuge
 cd $SCRATCH/centrifuge
 
 make THREADS=52 DONT_DUSTMASK=1 p_compressed
+
+sleep 5
+sacct -j $SLURM_JOBID --format=JobID,JobName%24,CPUTime,Elapsed,MaxRSS --units=G
+

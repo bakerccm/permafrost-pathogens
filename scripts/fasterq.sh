@@ -5,6 +5,9 @@
 #SBATCH -t 0-01:00       # runtime in D-HH:MM
 #SBATCH -p shared        # partition to submit to
 #SBATCH -J fasterq-dump  # job name
+#SBATCH -o slurm/fasterq-%j.out
+#SBATCH -e slurm/fasterq-%j.err
+##SBATCH --mail-type=BEGIN,END    # notifications: BEGIN,END,FAIL,ALL
 
 # get accession number from command line
 
@@ -29,4 +32,7 @@ cd ~/permafrost-pathogens/data/fastq
    echo ${accession} complete
 
 # done
+
+sleep 5
+sacct -j $SLURM_JOBID --format=JobID,JobName%24,CPUTime,Elapsed,MaxRSS --units=G
 

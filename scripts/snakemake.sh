@@ -6,8 +6,8 @@
 #SBATCH --mem=950G  # total mem
 #SBATCH --nodelist=node117 # comma separated list of node names to use`
 #SBATCH -J snakemake
-#SBATCH -o slurm/snakemake.out
-#SBATCH -e slurm/snakemake.err
+#SBATCH -o slurm/snakemake-%j.out
+#SBATCH -e slurm/snakemake-%j.err
 ##SBATCH --mail-type=BEGIN,END    # notifications: BEGIN,END,FAIL,ALL
 ##SBATCH --mail-user=
 
@@ -35,3 +35,7 @@ snakemake -j 64 --use-conda --rerun-incomplete out/megahit/{35m,45m,60m,83m,NT}/
 
 # snakemake -j 1 --use-conda -rerun-incomplete --unlock some_rule
 # snakemake -j 8 --use-conda -rerun-incomplete some_rule
+
+sleep 5
+sacct -j $SLURM_JOBID --format=JobID,JobName%24,CPUTime,Elapsed,MaxRSS --units=G
+

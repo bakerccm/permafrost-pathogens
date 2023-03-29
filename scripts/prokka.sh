@@ -5,8 +5,8 @@
 #SBATCH -p small  # partition to submit to
 ##SBATCH --mem=192G  # total mem (note TACC allocates whole nodes; using this argument causes job to fail)
 #SBATCH -J prokka
-#SBATCH -o slurm/prokka.out
-#SBATCH -e slurm/prokka.err
+#SBATCH -o slurm/prokka-%j.out
+#SBATCH -e slurm/prokka-%j.err
 #SBATCH --mail-type=BEGIN,END    # notifications: BEGIN,END,FAIL,ALL
 #SBATCH --mail-user=bakerccm@gmail.com
 
@@ -26,4 +26,7 @@ snakemake -j 16 --use-conda out/maxbin2_prokka/45m/45m.{001..107}
 snakemake -j 16 --use-conda out/maxbin2_prokka/60m/60m.{001..099}
 snakemake -j 16 --use-conda out/maxbin2_prokka/83m/83m.{001..071}
 snakemake -j 16 --use-conda out/maxbin2_prokka/NT/NT.{001..096}
+
+sleep 5
+sacct -j $SLURM_JOBID --format=JobID,JobName%24,CPUTime,Elapsed,MaxRSS --units=G
 
