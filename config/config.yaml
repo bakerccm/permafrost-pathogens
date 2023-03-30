@@ -38,6 +38,8 @@ metaquast:
 
 phyloflash:
     threads: 8
+    dbhome_dir: 'databases/phyloflash/138.1'
+    readlength: 100
 
 singlem:
     pipe:

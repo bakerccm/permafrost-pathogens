@@ -401,14 +401,23 @@ rule megahit_metaquast:
 ################################
 # use phyloflash to do some SSU-based analysis
 
-# Note phyloflash database should be generated first using
+# Note: phyloflash database should be generated first following instructions at
+#     http://hrgv.github.io/phyloFlash/install.html
+
+# Ideally, you can use phyloFlash_makedb.pl to automate the process:
+#    # activate conda environment with phyloflash in it
+#    # then ...
 #    mkdir -p databases/phyloflash
 #    cd databases/phyloflash
 #    phyloFlash_makedb.pl --remote
-# This automatically retrieves sequence files from the internet and builds databases
-# e.g. this one goes at databases/phyloflash/138.1
-# (where the name reflects the version of the Silva database that was downloaded)
-# -- this name needs to be specified below (probably it should be in the config file)
+
+# This should automatically retrieve sequence files from the internet and build databases.
+
+# Sometimes it fails though, in which case the files can be downloaded manually and supplied
+# to phyloFlash_makedb.pl (follow instructions at http://hrgv.github.io/phyloFlash/install.html).
+
+# Note that the location of the database (e.g. databases/phyloflash/138.1) needs to be 
+# supplied in /config/config.yaml
 
 rule all_phyloflash:
     input:
@@ -424,8 +433,8 @@ rule phyloflash:
         'out/phyloflash/{sample}.phyloFlash.tar.gz'
     params:
         output_dir = 'out/phyloflash',
-        readlength = 100,
-        dbhome_dir = 'databases/phyloflash/138.1'
+        readlength = config['phyloflash']['readlength'],
+        dbhome_dir = config['phyloflash']['dbhome_dir']
     threads:
         config['phyloflash']['threads']
     conda:
@@ -434,7 +443,8 @@ rule phyloflash:
         '''
         cd {params.output_dir}
         phyloFlash.pl -lib {wildcards.sample} -read1 ../../{input.read1} -read2 ../../{input.read2} \
-        -CPUs {threads} -readlength {params.readlength} -dbhome ../../{params.dbhome_dir} -poscov -treemap -zip -log
+        -CPUs {threads} -readlength {params.readlength} -dbhome ../../{params.dbhome_dir} \
+        -emirge -poscov -treemap -zip -log
         '''
 
 rule phyloflash_compare:
