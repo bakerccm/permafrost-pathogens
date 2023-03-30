@@ -4,5 +4,6 @@ channels:
  - bioconda
  - defaults
 dependencies:
+ - sortmerna=2.1b
  - phyloflash
  
