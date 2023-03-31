@@ -27,7 +27,7 @@ wildcard_constraints:
 import pandas as pd
 METADATA = pd.read_csv(METADATA_FILE, sep = '\t', index_col = 'sample')
 ALL_SAMPLES = list(METADATA.index)
-GOOD_SAMPLES = list(METADATA[METADATA.co_assembly != "NA"].index) # samples shown as "." in the co_assembly column are controls or poor quality --> exclude from assemblies
+GOOD_SAMPLES = list(METADATA[METADATA.co_assembly.isnull()].index) # samples that are NA in the co_assembly column in the data convert to NaN in the dataframe; these are controls or poor quality --> exclude from assemblies etc
 
 ################################
 # default rule
