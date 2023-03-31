@@ -444,7 +444,7 @@ rule phyloflash:
         cd {params.output_dir}
         phyloFlash.pl -lib {wildcards.sample} -read1 ../../{input.read1} -read2 ../../{input.read2} \
         -CPUs {threads} -readlength {params.readlength} -dbhome ../../{params.dbhome_dir} \
-        -emirge -poscov -treemap -zip -log
+        -poscov -treemap -zip -log
         '''
 
 rule phyloflash_compare:
