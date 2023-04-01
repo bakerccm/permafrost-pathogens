@@ -46,10 +46,10 @@ singlem:
         threads: 8
 
 bowtie2:
-    threads: 8
+    threads: 24
 
 maxbin2:
-    threads: 12
+    threads: 24
 
 checkm:
     threads: 12
