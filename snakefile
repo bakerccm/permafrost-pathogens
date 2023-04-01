@@ -508,6 +508,8 @@ rule singlem_summarise:
 
 # consider clustering OTUs, rarefying, beta diversity etc
 ################################
+## bowtie2 mapping of reads back to each co-assembly
+
 # create bowtie2 index for each megahit co-assembly
 
 rule all_bowtie2_build:
@@ -526,19 +528,21 @@ rule bowtie2_build:
     shell:
         'bowtie2-build {input} {params.bt2_index}'
 
+# perform mapping and compress results
+
 rule all_bowtie2_mapping:
     input:
         expand('out/megahit/{assembly}/bowtie2_mapping/{sample}.bam', zip, assembly = list(METADATA.co_assembly[GOOD_SAMPLES]), sample = GOOD_SAMPLES)
 
 rule bowtie2_mapping:
     input:
-        read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz',
-        read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq.gz',
+        read1 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R1.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
+        read2 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R2.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
         bowtie2_index = 'out/megahit/{assembly}/bowtie2_index.1.bt2' # just one of the files
     output:
-        temp('out/megahit/{assembly}/bowtie2_mapping/{sample}.sam')
+        temp('out/megahit/{assembly}/bowtie2_mapping/{assembly}.sam')
     log:
-        'out/megahit/{assembly}/bowtie2_mapping/{sample}.log'
+        'out/megahit/{assembly}/bowtie2_mapping/{assembly}.log'
     params:
         bt2_index = 'out/megahit/{assembly}/bowtie2_index' # file path stem for bowtie2 index
     conda:
@@ -547,19 +551,27 @@ rule bowtie2_mapping:
         config['bowtie2']['threads']
     shell:
         '''
-        bowtie2 -1 {input.read1} -2 {input.read2} -q \
+        # get file names and store as array
+            read1_files_space=({input.read1})
+            read2_files_space=({input.read2})
+
+        # use sed to replace spaces with commas (assumes no spaces in file names)
+            read1_files_comma=`echo ${{read1_files_space[@]}} | sed 's/ /,/g'`
+            read2_files_comma=`echo ${{read2_files_space[@]}} | sed 's/ /,/g'`
+
+        bowtie2 -1 ${{read1_files_comma}} -2 ${{read2_files_comma}} -q \
         -x {params.bt2_index} --no-unal --threads {threads} -S {output} 2>{log}
         '''
 
 rule bowtie2_compress_sort_index:
     input:
-        'out/megahit/{assembly}/bowtie2_mapping/{sample}.sam'
+        'out/megahit/{assembly}/bowtie2_mapping/{assembly}.sam'
     output:
-        'out/megahit/{assembly}/bowtie2_mapping/{sample}.bam'
+        'out/megahit/{assembly}/bowtie2_mapping/{assembly}.bam'
     conda:
         'envs/samtools.yaml'
     params:
-        temp_unsorted_bam = 'out/megahit/{assembly}/bowtie2_mapping/{sample}_raw.bam'
+        temp_unsorted_bam = 'out/megahit/{assembly}/bowtie2_mapping/{assembly}_raw.bam'
     shell:
         '''
         # convert to unsorted bam
@@ -571,25 +583,23 @@ rule bowtie2_compress_sort_index:
             samtools index {output}
         '''
 
-################################
-
 # get abundance info for each bowtie mapping
 
 rule all_bowtie_coverage:
     input:
-        expand('out/megahit/{assembly}/bowtie2_mapping/{sample}_coverage.txt', zip, assembly = list(METADATA.co_assembly[GOOD_SAMPLES]), sample = GOOD_SAMPLES),
-        expand('out/megahit/{assembly}/bowtie2_mapping/{sample}_meandepth.txt', zip, assembly = list(METADATA.co_assembly[GOOD_SAMPLES]), sample = GOOD_SAMPLES)
+        expand('out/megahit/{assembly}/bowtie2_mapping/{assembly}_coverage.txt', zip, assembly = {'35m','45m','60m','83m','NT'}),
+        expand('out/megahit/{assembly}/bowtie2_mapping/{assembly}_meandepth.txt', zip, assembly = {'35m','45m','60m','83m','NT'})
 
 rule get_bowtie_coverage:
     input:
-        'out/megahit/{assembly}/bowtie2_mapping/{sample}.bam'
+        'out/megahit/{assembly}/bowtie2_mapping/{assembly}.bam'
     output:
-        coverage = 'out/megahit/{assembly}/bowtie2_mapping/{sample}_coverage.txt', # full samtools coverage output
-        meandepth = 'out/megahit/{assembly}/bowtie2_mapping/{sample}_meandepth.txt' # just the meandepth column from the coverage output table
+        coverage = 'out/megahit/{assembly}/bowtie2_mapping/{assembly}_coverage.txt', # full samtools coverage output
+        meandepth = 'out/megahit/{assembly}/bowtie2_mapping/{assembly}_meandepth.txt' # just the meandepth column from the coverage output table
     conda:
         'envs/samtools.yaml'
     params:
-        bamfile_list = 'out/megahit/{assembly}/bowtie2_mapping/{sample}_bamfile_list.txt'
+        bamfile_list = 'out/megahit/{assembly}/bowtie2_mapping/{assembly}_bamfile_list.txt'
     shell:
         '''
         echo {input} >{params.bamfile_list}
@@ -597,14 +607,17 @@ rule get_bowtie_coverage:
         awk '{{print $1"\t"$6}}' {output.coverage} | grep -v '^#' > {output.meandepth}
         '''
 
+rule all_maxbin2:
+    input:
+        expand('out/maxbin2/{assembly}/done', assembly = {'35m','45m', '60m', '83m', 'NT'})
+
 rule maxbin2:
     input:
-        meandepth_tables = lambda wildcards: ('out/megahit/' + wildcards.assembly + '/bowtie2_mapping/' + sample + '_meandepth.txt' for sample in list(METADATA[METADATA["co_assembly"] == wildcards.assembly].index)),
+        meandepth = 'out/megahit/{assembly}/bowtie2_mapping/{assembly}_meandepth.txt',
         contigs = 'out/megahit/{assembly}/final.contigs.fa'
     output:
         'out/maxbin2/{assembly}/done'
     params:
-        meandepth_filelist = 'out/maxbin2/{assembly}/{assembly}_meandepth_filelist.txt',
         output_file_header = 'out/maxbin2/{assembly}/{assembly}'
     conda:
         'envs/maxbin2.yaml'
@@ -612,14 +625,8 @@ rule maxbin2:
         config['maxbin2']['threads']
     shell:
         '''
-        # get file names and store as array
-            meandepth_tables=({input.meandepth_tables})
-
-        # print file names to file separated by newlines
-            printf "%s\n" "${{meandepth_tables[@]}}" > {params.meandepth_filelist}
-
         run_MaxBin.pl -contig {input.contigs} -out {params.output_file_header} \
-        -thread {threads} -abund_list {params.meandepth_filelist}
+        -thread {threads} -abund_list {input.meandepth}
         
         touch {output}
         '''
