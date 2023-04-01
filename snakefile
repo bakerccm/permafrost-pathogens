@@ -532,7 +532,7 @@ rule bowtie2_build:
 
 rule all_bowtie2_mapping:
     input:
-        expand('out/megahit/{assembly}/bowtie2_mapping/{sample}.bam', zip, assembly = list(METADATA.co_assembly[GOOD_SAMPLES]), sample = GOOD_SAMPLES)
+        expand('out/megahit/{assembly}/bowtie2_mapping/{assembly}.bam', assembly = {'35m','45m','60m','83m','NT'})
 
 rule bowtie2_mapping:
     input:
@@ -587,8 +587,8 @@ rule bowtie2_compress_sort_index:
 
 rule all_bowtie_coverage:
     input:
-        expand('out/megahit/{assembly}/bowtie2_mapping/{assembly}_coverage.txt', zip, assembly = {'35m','45m','60m','83m','NT'}),
-        expand('out/megahit/{assembly}/bowtie2_mapping/{assembly}_meandepth.txt', zip, assembly = {'35m','45m','60m','83m','NT'})
+        expand('out/megahit/{assembly}/bowtie2_mapping/{assembly}_coverage.txt', assembly = {'35m','45m','60m','83m','NT'}),
+        expand('out/megahit/{assembly}/bowtie2_mapping/{assembly}_meandepth.txt', assembly = {'35m','45m','60m','83m','NT'})
 
 rule get_bowtie_coverage:
     input:
