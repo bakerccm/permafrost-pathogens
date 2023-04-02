@@ -626,7 +626,7 @@ rule maxbin2:
     shell:
         '''
         run_MaxBin.pl -contig {input.contigs} -out {params.output_file_header} \
-        -thread {threads} -abund_list {input.meandepth}
+        -thread {threads} -abund {input.meandepth}
         
         touch {output}
         '''
