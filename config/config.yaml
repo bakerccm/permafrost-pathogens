@@ -54,5 +54,8 @@ maxbin2:
 checkm:
     threads: 12
 
+prokka:
+    cpus: 8
+
 rgi:
     threads: 24

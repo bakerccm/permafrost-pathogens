@@ -25,9 +25,14 @@ wildcard_constraints:
 ## get sample and reference genome metadata
 
 import pandas as pd
+import os
+
 METADATA = pd.read_csv(METADATA_FILE, sep = '\t', index_col = 'sample')
 ALL_SAMPLES = list(METADATA.index)
 GOOD_SAMPLES = list(METADATA[METADATA.co_assembly.notnull()].index) # samples that are NA in the co_assembly column in the data convert to NaN in the dataframe; these are controls or poor quality --> exclude from assemblies etc
+
+# sampling locations within permafrost tunnel
+SAMPLING_LOCATIONS = ['35m','45m','60m','83m','NT']
 
 ################################
 ## default rule
@@ -40,9 +45,9 @@ rule all:
         'out/bbduk_noPhiX/multiqc_report.html',
         'out/bbduk_noPhiX_fastuniq/multiqc_report.html',
         'out/phyloflash/all_good_samples.phyloFlash_compare.barplot.pdf',
-        expand('out/metaquast/{assembly}/report.txt', assembly = {'35m','45m', '60m', '83m', 'NT'}),
-        expand('out/maxbin2/{assembly}/done', assembly = {'35m','45m', '60m', '83m', 'NT'}),
-        expand('out/maxbin2_checkm/{assembly}.txt', assembly = {'35m','45m', '60m', '83m', 'NT'}),
+        expand('out/metaquast/{assembly}/report.txt', assembly = SAMPLING_LOCATIONS),
+        expand('out/maxbin2/{assembly}', assembly = SAMPLING_LOCATIONS),
+        expand('out/maxbin2_checkm/{assembly}.txt', assembly = SAMPLING_LOCATIONS),
         # expand these to all assemblies and bins later
             'out/maxbin2_prokka/35m/35m.001',
             'out/maxbin2_staramr/35m/35m.001',
@@ -510,7 +515,7 @@ rule phyloflash_compare:
 
 rule all_bowtie2_build:
     input:
-        expand('out/megahit/{assembly}/bowtie2_index.1.bt2', assembly = {'35m','45m','60m','83m','NT'}) # just one of the files in each index
+        expand('out/megahit/{assembly}/bowtie2_index.1.bt2', assembly = SAMPLING_LOCATIONS) # just one of the files in each index
 
 rule bowtie2_build:
     input:
@@ -528,7 +533,7 @@ rule bowtie2_build:
 
 rule all_bowtie2_mapping:
     input:
-        expand('out/megahit/{assembly}/bowtie2_mapping/{assembly}.bam', assembly = {'35m','45m','60m','83m','NT'})
+        expand('out/megahit/{assembly}/bowtie2_mapping/{assembly}.bam', assembly = SAMPLING_LOCATIONS)
 
 rule bowtie2_mapping:
     input:
@@ -583,8 +588,8 @@ rule bowtie2_compress_sort_index:
 
 rule all_bowtie_coverage:
     input:
-        expand('out/megahit/{assembly}/bowtie2_mapping/{assembly}_coverage.txt', assembly = {'35m','45m','60m','83m','NT'}),
-        expand('out/megahit/{assembly}/bowtie2_mapping/{assembly}_meandepth.txt', assembly = {'35m','45m','60m','83m','NT'})
+        expand('out/megahit/{assembly}/bowtie2_mapping/{assembly}_coverage.txt', assembly = SAMPLING_LOCATIONS),
+        expand('out/megahit/{assembly}/bowtie2_mapping/{assembly}_meandepth.txt', assembly = SAMPLING_LOCATIONS)
 
 rule get_bowtie_coverage:
     input:
@@ -608,7 +613,7 @@ rule get_bowtie_coverage:
 
 rule all_maxbin2:
     input:
-        expand('out/maxbin2/{assembly}/done', assembly = {'35m','45m', '60m', '83m', 'NT'})
+        expand('out/maxbin2/{assembly}/done', assembly = SAMPLING_LOCATIONS)
 
 # this rule is a checkpoint because number of bins is not predetermined
 # checkpoint maxbin2:
@@ -617,7 +622,7 @@ rule maxbin2:
         meandepth = 'out/megahit/{assembly}/bowtie2_mapping/{assembly}_meandepth.txt',
         contigs = 'out/megahit/{assembly}/final.contigs.fa'
     output:
-        'out/maxbin2/{assembly}/done'
+        directory('out/maxbin2/{assembly}')
     params:
         output_file_header = 'out/maxbin2/{assembly}/{assembly}'
     conda:
@@ -655,7 +660,7 @@ rule maxbin2:
 
 rule checkm:
     input:
-        'out/maxbin2/{assembly}/done'
+        'out/maxbin2/{assembly}'
     output:
         dir = directory('out/maxbin2_checkm/{assembly}'), # checkm output folder
         file = 'out/maxbin2_checkm/{assembly}.txt'
@@ -690,37 +695,48 @@ rule checkm:
 ################################
 ## rapid prokaryotic genome annotation using prokka
 
-# need to automatically work out what files to ask for here, but for now this will do:
-# snakemake -j 56 --use-conda out/maxbin2_prokka/35m/35m.{001..053} # done
-# snakemake -j 56 --use-conda out/maxbin2_prokka/45m/45m.{001..107} # done
-# snakemake -j 56 --use-conda out/maxbin2_prokka/60m/60m.{001..099} # done
-# snakemake -j 56 --use-conda out/maxbin2_prokka/83m/83m.{001..071} # done
-# snakemake -j 56 --use-conda out/maxbin2_prokka/NT/NT.{001..096} # working on it
-
-#rule all_prokka:
-
-
+# perform prokka annotation for each bin
 rule prokka:
     input:
         'out/maxbin2/{assembly}/{bin}.fasta'
-        # 'out/maxbin2/{assembly}/done'
     output:
-        directory('out/maxbin2_prokka/{assembly}/{bin}') # maybe alter this once we know what output files look like
-    params:
-        # ?? out = 'databases/checkm'
+        directory('out/maxbin2_prokka/{assembly}/{bin}')
     conda:
         'envs/prokka.yaml'
+    threads:
+        config['prokka']['threads']
     shell:
         '''
-        prokka --outdir {output} --prefix {wildcards.bin} {input}
+        prokka --cpus {threads} --outdir {output} --prefix {wildcards.bin} {input}
         '''
+
+# gets all prokka annotation paths for a given assembly (determined by number of maxbin2 bins)
+def prokka_output_dirs(wildcards):
+    checkpoint_output = checkpoints.maxbin2.get(**wildcards).output[0]
+    return expand("out/maxbin2_prokka/{assembly}/{bin}",
+           assembly = wildcards.assembly,
+           bin = glob_wildcards(os.path.join(checkpoint_output, "{bin}.txt")).bin)
+
+# ask for prokka annotations for all bins in an assembly
+rule all_prokka_assembly:
+    input:
+        prokka_output_dirs
+    output:
+        "out/maxbin2_prokka/{assembly}.done"
+    shell:
+        "touch {output}"
+
+# ask for prokka annotation 'done' files for all assemblies
+rule all_prokka:
+    input:
+        expand("out/maxbin2_prokka/{assembly}.done", assembly = SAMPLING_LOCATIONS)
 
 ################################
 ## antimicrobial resistance analysis with staramr
 
 rule staramr:
     input:
-        'out/maxbin2/{assembly}/done'
+        'out/maxbin2/{assembly}'
     output:
         directory('out/maxbin2_staramr/{assembly}/{bin}')
     params:
@@ -746,7 +762,7 @@ rule staramr:
 
 rule rgi:
     input:
-        'out/maxbin2/{assembly}/done'
+        'out/maxbin2/{assembly}'
     output:
         'out/maxbin2_rgi/{assembly}/{bin}.txt'
     params:
