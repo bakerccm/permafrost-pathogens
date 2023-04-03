@@ -610,6 +610,8 @@ rule all_maxbin2:
     input:
         expand('out/maxbin2/{assembly}/done', assembly = {'35m','45m', '60m', '83m', 'NT'})
 
+# this rule is a checkpoint because number of bins is not predetermined
+# checkpoint maxbin2:
 rule maxbin2:
     input:
         meandepth = 'out/megahit/{assembly}/bowtie2_mapping/{assembly}_meandepth.txt',
@@ -694,21 +696,23 @@ rule checkm:
 # snakemake -j 56 --use-conda out/maxbin2_prokka/60m/60m.{001..099} # done
 # snakemake -j 56 --use-conda out/maxbin2_prokka/83m/83m.{001..071} # done
 # snakemake -j 56 --use-conda out/maxbin2_prokka/NT/NT.{001..096} # working on it
+
+#rule all_prokka:
+
+
 rule prokka:
     input:
-        # note sure how to specify fasta(s) as output of maxbin2 rule since number of bins is not predefined
-        # 'out/maxbin2/{assembly}/{bin}.fasta'
-        'out/maxbin2/{assembly}/done'
+        'out/maxbin2/{assembly}/{bin}.fasta'
+        # 'out/maxbin2/{assembly}/done'
     output:
         directory('out/maxbin2_prokka/{assembly}/{bin}') # maybe alter this once we know what output files look like
     params:
-        input_fasta = 'out/maxbin2/{assembly}/{bin}.fasta'
         # ?? out = 'databases/checkm'
     conda:
         'envs/prokka.yaml'
     shell:
         '''
-        prokka --outdir {output} --prefix {wildcards.bin} {params.input_fasta}
+        prokka --outdir {output} --prefix {wildcards.bin} {input}
         '''
 
 ################################
