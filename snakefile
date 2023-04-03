@@ -616,8 +616,7 @@ rule all_maxbin2:
         expand('out/maxbin2/{assembly}/done', assembly = SAMPLING_LOCATIONS)
 
 # this rule is a checkpoint because number of bins is not predetermined
-# checkpoint maxbin2:
-rule maxbin2:
+checkpoint maxbin2:
     input:
         meandepth = 'out/megahit/{assembly}/bowtie2_mapping/{assembly}_meandepth.txt',
         contigs = 'out/megahit/{assembly}/final.contigs.fa'
