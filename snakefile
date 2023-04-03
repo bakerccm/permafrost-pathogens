@@ -30,7 +30,7 @@ ALL_SAMPLES = list(METADATA.index)
 GOOD_SAMPLES = list(METADATA[METADATA.co_assembly.notnull()].index) # samples that are NA in the co_assembly column in the data convert to NaN in the dataframe; these are controls or poor quality --> exclude from assemblies etc
 
 ################################
-# default rule
+## default rule
 
 rule all:
     input:
@@ -104,10 +104,52 @@ rule raw_multiQC:
         'multiqc --interactive -f -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
-## run rules bbduk, bbduk_noPhiX and fastuniq, plus QC for each step
+## anaylze raw reads using singlem
+
+rule all_singlem:
+    input:
+        expand('out/singlem/{sample}.otu_table.tsv', sample = GOOD_SAMPLES)
+
+rule singlem:
+    input:
+        read1 = 'data/links/{sample}_R1.fastq.gz', # may want to use adapter-filtered reads instead; manual suggests not quality filtering since it can make the reads too short
+        read2 = 'data/links/{sample}_R2.fastq.gz'
+    output:
+        'out/singlem/{sample}.otu_table.tsv'
+    conda:
+        'envs/singlem.yaml'
+    threads:
+        config['singlem']['pipe']['threads']
+    shell:
+        '''
+        singlem pipe --forward {input.read1} --reverse {input.read2} \
+        --otu_table {output} --threads {threads}
+        '''
+# other popular options:
+# --output_extras	Output more detailed information in the OTU table.
+# --assignment_method {pplacer,diamond,diamond_example}
+#   Specify taxonomic assignment method [default: pplacer].
+# conda activate /work2/08186/cbaker/frontera/permafrost-pathogens/.snakemake/conda/89cb197209c9f30f798aec2bc588a442
+# see singlem pipe --full_help for more help
+
+rule singlem_summarise:
+    input:
+        expand('out/singlem/{sample}.otu_table.tsv', sample = GOOD_SAMPLES)
+    output:
+        krona = 'out/singlem/all_good_samples.krona.html',
+        OTU_table = 'out/singlem/all_good_samples.otu_table.tsv'
+    conda:
+        'envs/singlem.yaml'
+    shell:
+        '''
+        singlem summarise --input_otu_tables {input} --krona {output.krona}
+        singlem summarise --input_otu_tables {input} --output_otu_table {output.OTU_table}
+        '''
+
+################################
+## bbduk, bbduk_noPhiX and fastuniq, plus qc for each step
 
 # note: these rules should be run together like this if the outputs of bbduk and bbduk_noPhiX are temp()
-
 rule bbduk_fastuniq_all:
     input:
         "out/bbduk/multiqc_report.html",
@@ -118,6 +160,7 @@ rule bbduk_fastuniq_all:
 ## trim adapters etc using bbduk
 
 # see bbduk overview here http://seqanswers.com/forums/showthread.php?t=42776
+
 rule bbduk:
     input:
         read1 = 'data/links/{sample}_R1.fastq.gz',
@@ -245,11 +288,7 @@ rule bbduk_noPhiX_multiQC:
         'multiqc --interactive -f -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
-# deduplicate using FastUniq
-
-# commands for testing
-# snakemake --use-conda --rerun-incomplete -j 16 out/bbduk_noPhiX_fastuniq/35m-t0-R2_{R1,R2}.fastq.gz
-# snakemake --use-conda --rerun-incomplete -j 56 -np fastuniq_all
+## deduplicate using FastUniq
 
 rule fastuniq_decompress_inputs:
     input:
@@ -318,7 +357,7 @@ rule fastuniq_multiQC:
         'multiqc --interactive -f -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
-# megahit co-assembly
+## megahit co-assembly
 
 # co-assembles samples excluding failed samples, according to co_assembly column in samples.tsv metadata file
 # runtimes:
@@ -327,6 +366,7 @@ rule fastuniq_multiQC:
 #   60m: 08:35:44
 #   83m: 05:29:18
 #   NT : 10:20:45
+
 rule megahit_coassembly:
     input:
         read1 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R1.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
@@ -399,7 +439,7 @@ rule megahit_metaquast:
 #         'anvi-script-reformat-fasta {input} -o {output} -l {params.min_length} --simplify-names'
 
 ################################
-# use phyloflash to do some SSU-based analysis
+## use phyloflash for SSU-based analysis
 
 # Note: phyloflash database should be generated first following instructions at
 #     http://hrgv.github.io/phyloFlash/install.html
@@ -464,49 +504,6 @@ rule phyloflash_compare:
         # (or specify the actual files instead of the directory)
         '''
 
-################################
-
-rule all_singlem:
-    input:
-        expand('out/singlem/{sample}.otu_table.tsv', sample = GOOD_SAMPLES)
-
-rule singlem:
-    input:
-        read1 = 'data/links/{sample}_R1.fastq.gz', # may want to use adapter-filtered reads instead; manual suggests not quality filtering since it can make the reads too short
-        read2 = 'data/links/{sample}_R2.fastq.gz'
-    output:
-        'out/singlem/{sample}.otu_table.tsv'
-    conda:
-        'envs/singlem.yaml'
-    threads:
-        config['singlem']['pipe']['threads']
-    shell:
-        '''
-        singlem pipe --forward {input.read1} --reverse {input.read2} \
-        --otu_table {output} --threads {threads}
-        '''
-# other popular options:
-# --output_extras	Output more detailed information in the OTU table.
-# --assignment_method {pplacer,diamond,diamond_example}
-#   Specify taxonomic assignment method [default: pplacer].
-# conda activate /work2/08186/cbaker/frontera/permafrost-pathogens/.snakemake/conda/89cb197209c9f30f798aec2bc588a442
-# see singlem pipe --full_help for more help
-
-rule singlem_summarise:
-    input:
-        expand('out/singlem/{sample}.otu_table.tsv', sample = GOOD_SAMPLES)
-    output:
-        krona = 'out/singlem/all_good_samples.krona.html',
-        OTU_table = 'out/singlem/all_good_samples.otu_table.tsv'
-    conda:
-        'envs/singlem.yaml'
-    shell:
-        '''
-        singlem summarise --input_otu_tables {input} --krona {output.krona}
-        singlem summarise --input_otu_tables {input} --output_otu_table {output.OTU_table}
-        '''
-
-# consider clustering OTUs, rarefying, beta diversity etc
 ################################
 ## bowtie2 mapping of reads back to each co-assembly
 
@@ -607,6 +604,9 @@ rule get_bowtie_coverage:
         awk '{{print $1"\t"$6}}' {output.coverage} | grep -v '^#' > {output.meandepth}
         '''
 
+################################
+## bin contigs using maxbin2
+
 rule all_maxbin2:
     input:
         expand('out/maxbin2/{assembly}/done', assembly = {'35m','45m', '60m', '83m', 'NT'})
@@ -642,15 +642,15 @@ rule maxbin2:
 # (optional) -verbose (as is. Warning: output log will be LOOOONG.)
 # (optional) -markerset (choose between 107 marker genes by default or 40 marker genes. see Marker Gene Note for more information.)
 
-# use checkM to assess putative genomes
-# note databases need to be downloaded first. see install instructions https://github.com/Ecogenomics/CheckM/wiki/Installation#how-to-install-checkm
+################################
+## use checkM to assess putative genomes
+
+# note: databases need to be downloaded first. see install instructions https://github.com/Ecogenomics/CheckM/wiki/Installation#how-to-install-checkm
 #   mkdir -p databases/checkm
 #   cd databases/checkm
 #   wget 'https://data.ace.uq.edu.au/public/CheckM_databases/checkm_data_2015_01_16.tar.gz' # 276 MB download
 #   tar -xvf 'checkm_data_2015_01_16.tar.gz' # unpacks to a 1.4G directory
 #   rm 'checkm_data_2015_01_16.tar.gz'
-
-# it would be good to make checkm output this to a file ... -f flag should do it I think
 
 rule checkm:
     input:
@@ -685,7 +685,9 @@ rule checkm:
 #   checkm tree_qa <tree folder>
 # and possibly some additional qa outputs?
 # see https://github.com/Ecogenomics/CheckM/wiki/Genome-Quality-Commands#tree
+
 ################################
+## rapid prokaryotic genome annotation using prokka
 
 # need to automatically work out what files to ask for here, but for now this will do:
 # snakemake -j 56 --use-conda out/maxbin2_prokka/35m/35m.{001..053} # done
@@ -711,6 +713,7 @@ rule prokka:
         '''
 
 ################################
+## antimicrobial resistance analysis with staramr
 
 rule staramr:
     input:
@@ -727,6 +730,8 @@ rule staramr:
         '''
 
 ################################
+## antimicrobial resistance analysis with RGI
+
 # database needs to be set up first -- see https://github.com/arpcard/rgi#rgi-usage-documentation
 #   mkdir -p databases/RGI
 #   cd databases/RGI
