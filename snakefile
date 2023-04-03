@@ -131,7 +131,7 @@ rule singlem:
 #   Specify taxonomic assignment method [default: pplacer].
 # see singlem pipe --full_help for more help
 
-rule singlem_summarise:
+rule singlem_summarize:
     input:
         expand('out/singlem/{sample}.otu_table.tsv', sample = GOOD_SAMPLES)
     output:
