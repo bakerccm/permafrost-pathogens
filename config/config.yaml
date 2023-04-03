@@ -55,7 +55,7 @@ checkm:
     threads: 12
 
 prokka:
-    cpus: 8
+    threads: 8
 
 rgi:
     threads: 24
