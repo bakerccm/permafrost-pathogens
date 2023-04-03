@@ -129,7 +129,6 @@ rule singlem:
 # --output_extras	Output more detailed information in the OTU table.
 # --assignment_method {pplacer,diamond,diamond_example}
 #   Specify taxonomic assignment method [default: pplacer].
-# conda activate /work2/08186/cbaker/frontera/permafrost-pathogens/.snakemake/conda/89cb197209c9f30f798aec2bc588a442
 # see singlem pipe --full_help for more help
 
 rule singlem_summarise:
