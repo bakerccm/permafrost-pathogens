@@ -19,7 +19,8 @@ RAW_DATA_DIR = config['raw_data_dir']
 
 wildcard_constraints:
     sample = '[^_/]+',
-    file = '[^/]+'
+    file = '[^/]+',
+    assembly = '[^/]+'
 
 ################################
 ## get sample and reference genome metadata
