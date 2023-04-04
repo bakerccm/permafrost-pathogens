@@ -739,7 +739,7 @@ rule prokka_test:
     run:
         '''
         print(f'prokka output directories for {assembly} are: {input}')
-        touch {assembly}.done
+        touch {output}
         '''
 
 ################################
