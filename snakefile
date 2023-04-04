@@ -731,6 +731,12 @@ rule all_prokka:
     input:
         expand("out/maxbin2_prokka/{assembly}.done", assembly = SAMPLING_LOCATIONS)
 
+rule prokka_test:
+    input:
+        prokka_output_dirs
+    run: 
+        print(f'prokka output directories are: {input}')
+
 ################################
 ## antimicrobial resistance analysis with staramr
 
