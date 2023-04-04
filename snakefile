@@ -5,7 +5,7 @@
 # 29 December 2022
 
 from snakemake.utils import min_version
-min_version("6.4.1")
+min_version("7.25.0") # version 6.4.1 does NOT work
 
 ################################
 ## get config file
