@@ -49,8 +49,8 @@ rule all:
         expand('out/metaquast/{assembly}/report.txt', assembly = SAMPLING_LOCATIONS),
         expand('out/maxbin2/{assembly}', assembly = SAMPLING_LOCATIONS),
         expand('out/maxbin2_checkm/{assembly}.txt', assembly = SAMPLING_LOCATIONS),
-        # expand these to all assemblies and bins later
-            'out/maxbin2_prokka/35m/35m.001',
+        expand('out/maxbin2_prokka/{assembly}.done', assembly = SAMPLING_LOCATIONS),
+		# expand these to all assemblies and bins later
             'out/maxbin2_staramr/35m/35m.001',
             'out/maxbin2_rgi/35m/35m.001.txt'
 
