@@ -132,7 +132,7 @@ rule singlem:
         --otu_table {output} --threads {threads}
         '''
 # other popular options:
-# --output_extras	Output more detailed information in the OTU table.
+# --output_extras   Output more detailed information in the OTU table.
 # --assignment_method {pplacer,diamond,diamond_example}
 #   Specify taxonomic assignment method [default: pplacer].
 # see singlem pipe --full_help for more help
@@ -734,8 +734,13 @@ rule all_prokka:
 rule prokka_test:
     input:
         prokka_output_dirs
-    run: 
-        print(f'prokka output directories are: {input}')
+    output:
+        {assembly}.done
+    run:
+        '''
+        print(f'prokka output directories for {assembly} are: {input}')
+        touch {assembly}.done
+        '''
 
 ################################
 ## antimicrobial resistance analysis with staramr
