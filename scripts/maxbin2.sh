@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH -N 1  # nodes
-#SBATCH -n 56  # cores (note TACC allocates whole nodes)
-#SBATCH -t 0-04:00  # runtime in D-HH:MM
-#SBATCH -p small  # partition to submit to
-##SBATCH --mem=192G  # total mem (note TACC allocates whole nodes; using this argument causes job to fail)
-#SBATCH -J maxbin2-2
+#SBATCH -N 2  # nodes
+#SBATCH -n 48  # cores (note TACC allocates whole nodes)
+#SBATCH -t 2-00:00  # runtime in D-HH:MM
+#SBATCH -p shared  # partition to submit to
+##SBATCH --mem=192G  # total memory
+#SBATCH -J maxbin2
 #SBATCH -o slurm/maxbin2-%j.out
 #SBATCH -e slurm/maxbin2-%j.err
 ##SBATCH --mail-type=BEGIN,END    # notifications: BEGIN,END,FAIL,ALL
@@ -15,13 +15,12 @@
 ##SBATCH --dependency=afterok:jobid[:jobid...] # job can begin after specified jobs have completed with exit code zero
 ##SBATCH --dependency=afternotok:jobid[:jobid...] # job can begin after specified jobs have failed
 
-# use snakemake conda environment with snakemake 6.4.1 installed
-# note use of conda activate (preferred over source activate from conda v4.4 onwards)
-# conda activate snakemake
+eval "$(conda shell.bash hook)"
+conda activate snakemake-7.25.0
 
-source activate snakemake
+snakemake -j 48 --use-conda --rerun-incomplete --unlock all_maxbin2
 
-snakemake -j 56 --use-conda out/maxbin2/45m/done
+snakemake -j 48 --use-conda --rerun-incomplete all_maxbin2
 
 sleep 5
 sacct -j $SLURM_JOBID --format=JobID,JobName%24,CPUTime,Elapsed,MaxRSS --units=G

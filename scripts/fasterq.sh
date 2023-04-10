@@ -13,7 +13,8 @@
 
 accession=$1
 
-source activate SRAtools
+eval "$(conda shell.bash hook)"
+conda activate SRAtools
 
 cd ~/permafrost-pathogens/data/fastq
 

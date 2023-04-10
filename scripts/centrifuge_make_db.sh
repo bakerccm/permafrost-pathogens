@@ -14,7 +14,8 @@
 ##SBATCH --dependency=afterok:jobid[:jobid...] job can begin after specified jobs have completed with exit code zero
 ##SBATCH --dependency=afternotok:jobid[:jobid...] job can begin after specified jobs have failed
 
-source activate centrifuge
+eval "$(conda shell.bash hook)"
+conda activate centrifuge
 
 # cd $WORK/permafrost-pathogens/out/anvio/centrifuge
 
