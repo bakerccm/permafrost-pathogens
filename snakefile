@@ -137,18 +137,16 @@ rule singlem:
 #   Specify taxonomic assignment method [default: pplacer].
 # see singlem pipe --full_help for more help
 
-rule singlem_summarize:
+rule singlem_summarise:
     input:
         expand('out/singlem/{sample}.otu_table.tsv', sample = GOOD_SAMPLES)
     output:
-        krona = 'out/singlem/all_good_samples.krona.html',
-        OTU_table = 'out/singlem/all_good_samples.otu_table.tsv'
+        'out/singlem/all_good_samples.otu_table.tsv'
     conda:
         'envs/singlem.yaml'
     shell:
         '''
-        singlem summarise --input_otu_tables {input} --krona {output.krona}
-        singlem summarise --input_otu_tables {input} --output_otu_table {output.OTU_table}
+        singlem summarise --input_otu_tables {input} --output_otu_table {output}
         '''
 
 ################################

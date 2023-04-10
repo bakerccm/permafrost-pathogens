@@ -16,11 +16,8 @@
 ##SBATCH --dependency=afterok:jobid[:jobid...] # job can begin after specified jobs have completed with exit code zero
 ##SBATCH --dependency=afternotok:jobid[:jobid...] # job can begin after specified jobs have failed
 
-# use snakemake conda environment with snakemake 6.4.1 installed
-# note use of conda activate (preferred over source activate from conda v4.4 onwards)
-# conda activate snakemake
-
-source activate snakemake-6.4.1
+eval "$(conda shell.bash hook)"
+conda activate snakemake-7.25.0
 
 snakemake -j 64 --use-conda --rerun-incomplete --unlock out/megahit/{35m,45m,60m,83m,NT}/final.contigs.fa
 snakemake -j 64 --use-conda --rerun-incomplete out/megahit/{35m,45m,60m,83m,NT}/final.contigs.fa
