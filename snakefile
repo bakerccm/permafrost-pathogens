@@ -362,6 +362,72 @@ rule fastuniq_multiQC:
         'multiqc --interactive -f -o {params.outputdir} {params.inputdir} 2>{log}'
 
 ################################
+## use phyloflash for SSU-based analysis of reads
+
+# Note: phyloflash database should be generated first following instructions at
+#     http://hrgv.github.io/phyloFlash/install.html
+
+# Ideally, you can use phyloFlash_makedb.pl to automate the process:
+#    # activate conda environment with phyloflash in it
+#    # then ...
+#    mkdir -p databases/phyloflash
+#    cd databases/phyloflash
+#    phyloFlash_makedb.pl --remote
+
+# This should automatically retrieve sequence files from the internet and build databases.
+
+# Sometimes it fails though, in which case the files can be downloaded manually and supplied
+# to phyloFlash_makedb.pl (follow instructions at http://hrgv.github.io/phyloFlash/install.html).
+
+# Note that the location of the database (e.g. databases/phyloflash/138.1) needs to be 
+# supplied in /config/config.yaml
+
+rule all_phyloflash:
+    input:
+        expand('out/phyloflash/{sample}.phyloFlash.html', sample = GOOD_SAMPLES)
+
+rule phyloflash:
+    input:
+        read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz', # cleaned data files
+        read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq.gz'
+    output:
+        'out/phyloflash/{sample}.phyloFlash.html',
+        'out/phyloflash/{sample}.phyloFlash.log',
+        'out/phyloflash/{sample}.phyloFlash.tar.gz'
+    params:
+        output_dir = 'out/phyloflash',
+        readlength = config['phyloflash']['readlength'],
+        dbhome_dir = config['phyloflash']['dbhome_dir']
+    threads:
+        config['phyloflash']['threads']
+    conda:
+        'envs/phyloflash.yaml'
+    shell:
+        '''
+        cd {params.output_dir}
+        phyloFlash.pl -lib {wildcards.sample} -read1 ../../{input.read1} -read2 ../../{input.read2} \
+        -CPUs {threads} -readlength {params.readlength} -dbhome ../../{params.dbhome_dir} \
+        -poscov -treemap -zip -log
+        '''
+
+rule phyloflash_compare:
+    input:
+        expand('out/phyloflash/{sample}.phyloFlash.tar.gz', sample = GOOD_SAMPLES)
+    output:
+        'out/phyloflash/all_good_samples.phyloFlash_compare.barplot.pdf',
+        'out/phyloflash/all_good_samples.phyloFlash_compare.heatmap.pdf',
+        'out/phyloflash/all_good_samples.phyloFlash_compare.matrix.tsv',
+        'out/phyloflash/all_good_samples.phyloFlash_compare.ntu_table.tsv'
+    conda:
+        'envs/phyloflash.yaml'
+    shell:
+        '''
+        cd out/phyloflash
+        phyloFlash_compare.pl --allzip --task barplot,heatmap,matrix,ntu_table -out all_good_samples.phyloFlash_compare
+        # (or specify the actual files instead of the directory)
+        '''
+
+################################
 ## megahit co-assembly
 
 # co-assembles samples excluding failed samples, according to co_assembly column in samples.tsv metadata file
@@ -442,72 +508,6 @@ rule megahit_metaquast:
 #         'envs/anvio-minimal.yaml'
 #     shell:
 #         'anvi-script-reformat-fasta {input} -o {output} -l {params.min_length} --simplify-names'
-
-################################
-## use phyloflash for SSU-based analysis
-
-# Note: phyloflash database should be generated first following instructions at
-#     http://hrgv.github.io/phyloFlash/install.html
-
-# Ideally, you can use phyloFlash_makedb.pl to automate the process:
-#    # activate conda environment with phyloflash in it
-#    # then ...
-#    mkdir -p databases/phyloflash
-#    cd databases/phyloflash
-#    phyloFlash_makedb.pl --remote
-
-# This should automatically retrieve sequence files from the internet and build databases.
-
-# Sometimes it fails though, in which case the files can be downloaded manually and supplied
-# to phyloFlash_makedb.pl (follow instructions at http://hrgv.github.io/phyloFlash/install.html).
-
-# Note that the location of the database (e.g. databases/phyloflash/138.1) needs to be 
-# supplied in /config/config.yaml
-
-rule all_phyloflash:
-    input:
-        expand('out/phyloflash/{sample}.phyloFlash.html', sample = GOOD_SAMPLES)
-
-rule phyloflash:
-    input:
-        read1 = 'out/bbduk_noPhiX_fastuniq/{sample}_R1.fastq.gz', # cleaned data files
-        read2 = 'out/bbduk_noPhiX_fastuniq/{sample}_R2.fastq.gz'
-    output:
-        'out/phyloflash/{sample}.phyloFlash.html',
-        'out/phyloflash/{sample}.phyloFlash.log',
-        'out/phyloflash/{sample}.phyloFlash.tar.gz'
-    params:
-        output_dir = 'out/phyloflash',
-        readlength = config['phyloflash']['readlength'],
-        dbhome_dir = config['phyloflash']['dbhome_dir']
-    threads:
-        config['phyloflash']['threads']
-    conda:
-        'envs/phyloflash.yaml'
-    shell:
-        '''
-        cd {params.output_dir}
-        phyloFlash.pl -lib {wildcards.sample} -read1 ../../{input.read1} -read2 ../../{input.read2} \
-        -CPUs {threads} -readlength {params.readlength} -dbhome ../../{params.dbhome_dir} \
-        -poscov -treemap -zip -log
-        '''
-
-rule phyloflash_compare:
-    input:
-        expand('out/phyloflash/{sample}.phyloFlash.tar.gz', sample = GOOD_SAMPLES)
-    output:
-        'out/phyloflash/all_good_samples.phyloFlash_compare.barplot.pdf',
-        'out/phyloflash/all_good_samples.phyloFlash_compare.heatmap.pdf',
-        'out/phyloflash/all_good_samples.phyloFlash_compare.matrix.tsv',
-        'out/phyloflash/all_good_samples.phyloFlash_compare.ntu_table.tsv'
-    conda:
-        'envs/phyloflash.yaml'
-    shell:
-        '''
-        cd out/phyloflash
-        phyloFlash_compare.pl --allzip --task barplot,heatmap,matrix,ntu_table -out all_good_samples.phyloFlash_compare
-        # (or specify the actual files instead of the directory)
-        '''
 
 ################################
 ## bowtie2 mapping of reads back to each co-assembly
