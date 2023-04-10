@@ -3,6 +3,10 @@
 /data/fastq/*
 /out/*
 
+# ignore databases
+/databases/checkm/*
+/databases/phyloflash/*
+
 # ignore snakemake working files
 /.snakemake
 /snakemake.err
