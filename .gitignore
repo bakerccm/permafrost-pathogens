@@ -1,6 +1,7 @@
 # ignore input and output data
 # note trailing /* is required for use with !.gitkeep
 /data/fastq/*
+/data/links/*
 /out/*
 
 # ignore databases
