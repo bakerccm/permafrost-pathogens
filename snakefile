@@ -493,6 +493,41 @@ rule megahit_metaquast:
         'metaquast.py -o {params.output_dir} -t {threads} --max-ref-number 0 {input}'
 
 ################################
+# use MMseq2 to assign taxonomy to megahit contigs
+
+# make MMseqs2 database
+# {database_name} can be NT (nucleotide), GTDB (amino acid), or more
+# - see PDF documentation at https://mmseqs.com/latest/userguide.pdf
+#   or wiki at https://github.com/soedinglab/mmseqs2/wiki
+rule mmseqs2_make_database:
+    output:
+        directory("databases/mmseqs2/{database_name}")
+    params:
+        temp = "out/mmseqs2/database_temp_{database_name}"
+    threads:
+        config['mmseqs']['database']['threads']
+    conda:
+        'envs/mmseqs2.yaml'
+    shell:
+        'mmseqs databases {database_name} {output} {params.temp} --threads {threads}'
+ 
+# assign taxonomy to megahit assembly based on 2bLCA hit
+rule mmseqs2_easy_taxonomy:
+    input:
+        fasta = "out/megahit/{assembly}/final.contigs.fa",
+        database = directory("databases/mmseqs2/{database_name}")
+    output:
+        directory("out/mmseqs2/{assembly}")
+    params:
+        temp = "out/mmseqs2/easy-taxonomy_temp_{database_name}"
+    threads:
+        config['mmseqs']['database']['threads']
+    conda:
+        'envs/mmseqs2.yaml'
+    shell:
+        'mmseqs easy-taxonomy {input.fasta} {input.database} {output} {params.temp} --threads {threads}'
+
+################################
 # this rule fails with errors messages about missing contextvars and missing django
 
 # rule reformat_megahit_contigs:

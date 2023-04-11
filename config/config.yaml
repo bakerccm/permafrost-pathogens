@@ -30,16 +30,22 @@ bbduk:
 fastuniq:
     threads: 6
     
+phyloflash:
+    threads: 8
+    dbhome_dir: 'databases/phyloflash/138.1'
+    readlength: 100
+
 megahit:
     threads: 64
 
 metaquast:
     threads: 4
 
-phyloflash:
-    threads: 8
-    dbhome_dir: 'databases/phyloflash/138.1'
-    readlength: 100
+mmseqs:
+    database:
+        threads: 24
+    easy-taxonomy:
+        threads: 24
 
 singlem:
     pipe:
