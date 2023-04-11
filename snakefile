@@ -500,6 +500,7 @@ rule megahit_metaquast:
 # {database_name} can be NT (nucleotide), GTDB (amino acid), or more
 # - see PDF documentation at https://mmseqs.com/latest/userguide.pdf
 #   or wiki at https://github.com/soedinglab/mmseqs2/wiki
+# On Premise: run this rule in screen on login node since it requires internet connectivity
 rule mmseqs2_make_database:
     output:
         directory("databases/mmseqs2/{database_name}")
