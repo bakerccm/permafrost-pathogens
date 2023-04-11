@@ -510,7 +510,7 @@ rule mmseqs2_make_database:
     conda:
         'envs/mmseqs2.yaml'
     shell:
-        'mmseqs databases {database_name} {output} {params.temp} --threads {threads}'
+        'mmseqs databases {wildcards.database_name} {output} {params.temp} --threads {threads}'
  
 # assign taxonomy to megahit assembly based on 2bLCA hit
 rule mmseqs2_easy_taxonomy:
