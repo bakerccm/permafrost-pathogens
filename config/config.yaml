@@ -43,7 +43,7 @@ metaquast:
 
 mmseqs:
     database:
-        threads: 24
+        threads: 1
     easy-taxonomy:
         threads: 24
 
