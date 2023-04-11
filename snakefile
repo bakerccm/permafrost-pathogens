@@ -47,10 +47,11 @@ rule all:
         'out/bbduk_noPhiX_fastuniq/multiqc_report.html',
         'out/phyloflash/all_good_samples.phyloFlash_compare.barplot.pdf',
         expand('out/metaquast/{assembly}/report.txt', assembly = SAMPLING_LOCATIONS),
+        expand('out/mmseqs2/{assembly}/{database_name}', assembly = SAMPLING_LOCATIONS, database_name = ["NT","GTDB"]),
         expand('out/maxbin2/{assembly}', assembly = SAMPLING_LOCATIONS),
         expand('out/maxbin2_checkm/{assembly}.txt', assembly = SAMPLING_LOCATIONS),
         expand('out/maxbin2_prokka/{assembly}.done', assembly = SAMPLING_LOCATIONS),
-		# expand these to all assemblies and bins later
+        # expand these to all assemblies and bins later
             'out/maxbin2_staramr/35m/35m.001',
             'out/maxbin2_rgi/35m/35m.001.txt'
 
@@ -96,7 +97,7 @@ rule raw_fastqc:
 
 rule raw_multiQC:
     input:
-        fastqc = expand('out/raw/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+        fastqc = expand('out/raw/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = ['R1','R2'])
     output:
         'out/raw/multiqc_report.html'
     params:
@@ -216,7 +217,7 @@ rule bbduk_fastqc:
 
 rule bbduk_multiQC:
     input:
-        fastqc = expand('out/bbduk/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+        fastqc = expand('out/bbduk/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = ['R1','R2'])
     output:
         'out/bbduk/multiqc_report.html'
     params:
@@ -277,7 +278,7 @@ rule bbduk_noPhiX_fastqc:
 
 rule bbduk_noPhiX_multiQC:
     input:
-        fastqc = expand('out/bbduk_noPhiX/{sample}_unmatched_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+        fastqc = expand('out/bbduk_noPhiX/{sample}_unmatched_{read}_fastqc.zip', sample = ALL_SAMPLES, read = ['R1','R2'])
     output:
         'out/bbduk_noPhiX/multiqc_report.html'
     params:
@@ -346,7 +347,7 @@ rule fastuniq_fastqc:
 
 rule fastuniq_multiQC:
     input:
-        fastqc = expand('out/bbduk_noPhiX_fastuniq/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = {'R1','R2'})
+        fastqc = expand('out/bbduk_noPhiX_fastuniq/{sample}_{read}_fastqc.zip', sample = ALL_SAMPLES, read = ['R1','R2'])
     output:
         'out/bbduk_noPhiX_fastuniq/multiqc_report.html'
     params:
@@ -515,9 +516,9 @@ rule mmseqs2_make_database:
 rule mmseqs2_easy_taxonomy:
     input:
         fasta = "out/megahit/{assembly}/final.contigs.fa",
-        database = directory("databases/mmseqs2/{database_name}")
+        database = "databases/mmseqs2/{database_name}"
     output:
-        directory("out/mmseqs2/{assembly}")
+        directory("out/mmseqs2/{assembly}/{database_name}")
     params:
         temp = "out/mmseqs2/easy-taxonomy_temp_{database_name}"
     threads:
