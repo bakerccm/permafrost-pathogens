@@ -511,8 +511,12 @@ rule mmseqs2_make_database:
     conda:
         'envs/mmseqs2.yaml'
     shell:
-        'mmseqs databases {wildcards.database_name} {output} {params.temp} --threads {threads}'
- 
+        '''
+        rm -rf {params.temp}
+        mkdir -p {params.temp}
+        mmseqs databases {wildcards.database_name} {output} {params.temp} --threads {threads}
+        '''
+
 # assign taxonomy to megahit assembly based on 2bLCA hit
 rule mmseqs2_easy_taxonomy:
     input:
@@ -527,7 +531,11 @@ rule mmseqs2_easy_taxonomy:
     conda:
         'envs/mmseqs2.yaml'
     shell:
-        'mmseqs easy-taxonomy {input.fasta} {input.database} {output} {params.temp} --threads {threads}'
+        '''
+        rm -rf {params.temp}
+        mkdir -p {params.temp}
+        mmseqs easy-taxonomy {input.fasta} {input.database} {output} {params.temp} --threads {threads}
+        '''
 
 ################################
 # this rule fails with errors messages about missing contextvars and missing django
