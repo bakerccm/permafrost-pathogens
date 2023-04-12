@@ -503,9 +503,9 @@ rule megahit_metaquast:
 # On Premise: run this rule in screen on login node since it requires internet connectivity
 rule mmseqs2_make_database:
     output:
-        directory("databases/mmseqs2/{database_name}")
+        "databases/mmseqs2/{database_name}.index
     params:
-        temp = "out/mmseqs2/database_temp_{database_name}"
+        temp = "databases/mmseqs2/temp_{database_name}"
     threads:
         config['mmseqs']['database']['threads']
     conda:
