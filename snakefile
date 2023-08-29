@@ -677,6 +677,31 @@ checkpoint maxbin2:
 # (optional) -markerset (choose between 107 marker genes by default or 40 marker genes. see Marker Gene Note for more information.)
 
 ################################
+## bin contigs using concoct
+
+# see https://concoct.readthedocs.io/en/latest/usage.html for basic guidance
+
+# cut up contigs into smaller parts
+# see https://concoct.readthedocs.io/en/latest/scripts/cut_up_fasta.html#usage
+rule concoct_cut_up_contigs:
+    input:
+        contigs = 'out/megahit/{assembly}/final.contigs.fa'
+    output:
+        bedfile = 'out/concoct/{assembly}/contigs_cut.bed',
+        fasta = 'out/concoct/{assembly}/contigs_cut.fa'
+    params:
+        chunk_size = config['concoct']['cut_up_fasta']['chunk_size'],
+        overlap_size = config['concoct']['cut_up_fasta']['overlap_size']
+    conda:
+        'envs/concoct-1.1.0.yaml'
+    shell:
+        '''
+        cut_up_fasta.py {input.contigs} \
+            --chunk_size {params.chunk_size} --overlap_size {params.overlap_size} \
+            --merge_last --bedfile {output.bedfile} > {output.fasta}
+        '''
+
+################################
 ## use checkM to assess putative genomes
 
 # note: databases need to be downloaded first. see install instructions https://github.com/Ecogenomics/CheckM/wiki/Installation#how-to-install-checkm

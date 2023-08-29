@@ -57,6 +57,11 @@ bowtie2:
 maxbin2:
     threads: 24
 
+concoct:
+    cut_up_fasta:
+        chunk_size: 10000
+        overlap_size: 0
+
 checkm:
     threads: 12
 
