@@ -538,21 +538,6 @@ rule mmseqs2_easy_taxonomy:
         '''
 
 ################################
-# this rule fails with errors messages about missing contextvars and missing django
-
-# rule reformat_megahit_contigs:
-#     input:
-#         "out/megahit/{assembly}/final.contigs.fa"
-#     output:
-#         "out/megahit/{assembly}/contigs.fa"
-#     params:
-#         min_length = 1000
-#     conda:
-#         'envs/anvio-minimal.yaml'
-#     shell:
-#         'anvi-script-reformat-fasta {input} -o {output} -l {params.min_length} --simplify-names'
-
-################################
 ## bowtie2 mapping of reads back to each co-assembly
 
 # create bowtie2 index for each megahit co-assembly
