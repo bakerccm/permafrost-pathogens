@@ -686,7 +686,7 @@ rule all_concoct:
         expand('out/concoct/{assembly}/contigs_cut.fa', assembly = SAMPLING_LOCATIONS)
 
 # cut up contigs into smaller parts
-# see https://concoct.readthedocs.io/en/latest/scripts/cut_up_fasta.html#usage
+# see https://concoct.readthedocs.io/en/latest/scripts/cut_up_fasta.html
 rule concoct_cut_up_contigs:
     input:
         contigs = 'out/megahit/{assembly}/final.contigs.fa'
@@ -704,6 +704,25 @@ rule concoct_cut_up_contigs:
             --chunk_size {params.chunk_size} --overlap_size {params.overlap_size} \
             --merge_last --bedfile {output.bedfile} > {output.fasta}
         '''
+
+# generate table with coverage depth information per sample and subcontig
+##
+## This step assumes the directory ‘mapping’ contains sorted and indexed bam files
+## where each sample has been mapped against the original contigs:
+##
+# see https://concoct.readthedocs.io/en/latest/scripts/concoct_coverage_table.html
+rule concoct_coverage_table:
+    input:
+        bedfile = 'out/concoct/{assembly}/contigs_cut.bed',
+        bamfiles = 'out/megahit/{assembly}/bowtie2_mapping/{assembly}.bam' # but use the ones for each sample I think ("mapping/Sample*.sorted.bam" ?)
+    output:
+        'out/concoct/{assembly}/coverage_table.tsv
+    conda:
+        'envs/concoct-1.1.0.yaml'
+    shell:
+        'concoct_coverage_table.py {input.bedfile} {input.bamfiles} > {output}'
+
+## work out bowtie mappings (per sample? per assembly? is coverage correct with maxbin2 pipeline?) ##
 
 ################################
 ## use checkM to assess putative genomes
