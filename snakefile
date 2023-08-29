@@ -681,6 +681,10 @@ checkpoint maxbin2:
 
 # see https://concoct.readthedocs.io/en/latest/usage.html for basic guidance
 
+rule all_concoct:
+    input:
+        expand('out/concoct/{assembly}/contigs_cut.fa', assembly = SAMPLING_LOCATIONS)
+
 # cut up contigs into smaller parts
 # see https://concoct.readthedocs.io/en/latest/scripts/cut_up_fasta.html#usage
 rule concoct_cut_up_contigs:
