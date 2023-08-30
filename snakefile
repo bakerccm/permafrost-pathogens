@@ -716,7 +716,7 @@ rule concoct_coverage_table:
         bedfile = 'out/concoct/{assembly}/contigs_cut.bed',
         bamfiles = 'out/megahit/{assembly}/bowtie2_mapping/{assembly}.bam' # but use the ones for each sample I think ("mapping/Sample*.sorted.bam" ?)
     output:
-        'out/concoct/{assembly}/coverage_table.tsv
+        'out/concoct/{assembly}/coverage_table.tsv'
     conda:
         'envs/concoct-1.1.0.yaml'
     shell:
