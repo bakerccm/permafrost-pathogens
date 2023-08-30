@@ -540,7 +540,7 @@ rule mmseqs2_easy_taxonomy:
 ################################
 ## bowtie2 mapping of reads back to each co-assembly
 
-# create bowtie2 index for each megahit co-assembly
+# create a bowtie2 index for each megahit co-assembly
 
 rule all_bowtie2_build:
     input:
@@ -681,9 +681,10 @@ checkpoint maxbin2:
 
 # see https://concoct.readthedocs.io/en/latest/usage.html for basic guidance
 
+# all output from concoct_coverage_table rule
 rule all_concoct:
     input:
-        expand('out/concoct/{assembly}/contigs_cut.fa', assembly = SAMPLING_LOCATIONS)
+        expand('out/concoct/{assembly}/coverage_table.tsv', assembly = SAMPLING_LOCATIONS)
 
 # cut up contigs into smaller parts
 # see https://concoct.readthedocs.io/en/latest/scripts/cut_up_fasta.html
@@ -706,23 +707,18 @@ rule concoct_cut_up_contigs:
         '''
 
 # generate table with coverage depth information per sample and subcontig
-##
-## This step assumes the directory ‘mapping’ contains sorted and indexed bam files
-## where each sample has been mapped against the original contigs:
-##
 # see https://concoct.readthedocs.io/en/latest/scripts/concoct_coverage_table.html
+## confirm these bamfiles are right, and we don't need per-sample ones ##
 rule concoct_coverage_table:
     input:
         bedfile = 'out/concoct/{assembly}/contigs_cut.bed',
-        bamfiles = 'out/megahit/{assembly}/bowtie2_mapping/{assembly}.bam' # but use the ones for each sample I think ("mapping/Sample*.sorted.bam" ?)
+        bamfiles = 'out/megahit/{assembly}/bowtie2_mapping/{assembly}.bam'
     output:
         'out/concoct/{assembly}/coverage_table.tsv'
     conda:
         'envs/concoct-1.1.0.yaml'
     shell:
         'concoct_coverage_table.py {input.bedfile} {input.bamfiles} > {output}'
-
-## work out bowtie mappings (per sample? per assembly? is coverage correct with maxbin2 pipeline?) ##
 
 ################################
 ## use checkM to assess putative genomes
