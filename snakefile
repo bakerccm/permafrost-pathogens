@@ -681,6 +681,12 @@ checkpoint maxbin2:
 ## bin contigs using concoct
 
 # see https://concoct.readthedocs.io/en/latest/usage.html for basic guidance
+# "This guide assumes you have your original contigs assembled into a file 
+# original_contigs.fa and that you have mapped reads from several samples to 
+# these contigs into .bam files. Note that the assembly can be constructed 
+# using either one single sample or several (usually all) samples. In either
+# case, all sample reads should be mapped against the assembly to achieve the 
+# best binning performance."
 
 # all output from concoct_coverage_table rule
 rule all_concoct:
