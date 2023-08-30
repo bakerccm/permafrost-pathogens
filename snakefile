@@ -5,7 +5,7 @@
 # 29 December 2022
 
 from snakemake.utils import min_version
-min_version("7.25.0") # version 6.4.1 does NOT work
+min_version('7.25.0') # version 6.4.1 does NOT work
 
 ################################
 ## get config file
@@ -47,7 +47,7 @@ rule all:
         'out/bbduk_noPhiX_fastuniq/multiqc_report.html',
         'out/phyloflash/all_good_samples.phyloFlash_compare.barplot.pdf',
         expand('out/metaquast/{assembly}/report.txt', assembly = SAMPLING_LOCATIONS),
-        expand('out/mmseqs2/{assembly}/{database_name}', assembly = SAMPLING_LOCATIONS, database_name = ["NT","GTDB"]),
+        expand('out/mmseqs2/{assembly}/{database_name}', assembly = SAMPLING_LOCATIONS, database_name = ['NT','GTDB']),
         expand('out/maxbin2/{assembly}', assembly = SAMPLING_LOCATIONS),
         expand('out/maxbin2_checkm/{assembly}.txt', assembly = SAMPLING_LOCATIONS),
         expand('out/maxbin2_prokka/{assembly}.done', assembly = SAMPLING_LOCATIONS),
@@ -65,8 +65,8 @@ rule all_raw_data_links:
 rule raw_data_link:
     input:
         # note these are specified relative to snakemake root
-        read1 = lambda wildcards: RAW_DATA_DIR + "/" + METADATA.loc[wildcards.sample,'read1'],
-        read2 = lambda wildcards: RAW_DATA_DIR + "/" + METADATA.loc[wildcards.sample,'read2']
+        read1 = lambda wildcards: RAW_DATA_DIR + '/' + METADATA.loc[wildcards.sample,'read1'],
+        read2 = lambda wildcards: RAW_DATA_DIR + '/' + METADATA.loc[wildcards.sample,'read2']
     output:
         read1 = 'data/links/{sample}_R1.fastq.gz',
         read2 = 'data/links/{sample}_R2.fastq.gz'
@@ -156,9 +156,9 @@ rule singlem_summarise:
 # note: these rules should be run together like this if the outputs of bbduk and bbduk_noPhiX are temp()
 rule bbduk_fastuniq_all:
     input:
-        "out/bbduk/multiqc_report.html",
-        "out/bbduk_noPhiX/multiqc_report.html",
-        "out/bbduk_noPhiX_fastuniq/multiqc_report.html"
+        'out/bbduk/multiqc_report.html',
+        'out/bbduk_noPhiX/multiqc_report.html',
+        'out/bbduk_noPhiX_fastuniq/multiqc_report.html'
 
 ################################
 ## trim adapters etc using bbduk
@@ -439,14 +439,14 @@ rule phyloflash_compare:
 
 rule megahit_coassembly:
     input:
-        read1 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R1.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
-        read2 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R2.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)]
+        read1 = lambda wildcards: ['out/bbduk_noPhiX_fastuniq/' + sample + '_R1.fastq.gz' for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
+        read2 = lambda wildcards: ['out/bbduk_noPhiX_fastuniq/' + sample + '_R2.fastq.gz' for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)]
     output:
-        "out/megahit/{assembly}/final.contigs.fa"
+        'out/megahit/{assembly}/final.contigs.fa'
     params:
-        output_dir = "out/megahit/{assembly}"
+        output_dir = 'out/megahit/{assembly}'
     log:
-        "out/megahit/{assembly}.log"
+        'out/megahit/{assembly}.log'
     threads:
         config['megahit']['threads']
     conda:
@@ -477,11 +477,11 @@ rule megahit_coassembly:
 # takes 5 min to run without gene finding
 rule megahit_metaquast:
     input:
-        "out/megahit/{assembly}/final.contigs.fa"
+        'out/megahit/{assembly}/final.contigs.fa'
     output:
-        "out/metaquast/{assembly}/report.txt" # there are several other output files in this directory too
+        'out/metaquast/{assembly}/report.txt' # there are several other output files in this directory too
     params:
-        output_dir = "out/metaquast/{assembly}"
+        output_dir = 'out/metaquast/{assembly}'
     threads:
         config['metaquast']['threads']
     conda:
@@ -503,9 +503,9 @@ rule megahit_metaquast:
 # On Premise: run this rule in screen on login node since it requires internet connectivity
 rule mmseqs2_make_database:
     output:
-        "databases/mmseqs2/{database_name}.index
+        'databases/mmseqs2/{database_name}.index'
     params:
-        temp = "databases/mmseqs2/temp_{database_name}"
+        temp = 'databases/mmseqs2/temp_{database_name}'
     threads:
         config['mmseqs']['database']['threads']
     conda:
@@ -520,12 +520,12 @@ rule mmseqs2_make_database:
 # assign taxonomy to megahit assembly based on 2bLCA hit
 rule mmseqs2_easy_taxonomy:
     input:
-        fasta = "out/megahit/{assembly}/final.contigs.fa",
-        database = "databases/mmseqs2/{database_name}"
+        fasta = 'out/megahit/{assembly}/final.contigs.fa',
+        database = 'databases/mmseqs2/{database_name}'
     output:
-        directory("out/mmseqs2/{assembly}/{database_name}")
+        directory('out/mmseqs2/{assembly}/{database_name}')
     params:
-        temp = "out/mmseqs2/easy-taxonomy_temp_{database_name}"
+        temp = 'out/mmseqs2/easy-taxonomy_temp_{database_name}'
     threads:
         config['mmseqs']['database']['threads']
     conda:
@@ -566,8 +566,8 @@ rule all_bowtie2_mapping:
 
 rule bowtie2_mapping:
     input:
-        read1 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R1.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
-        read2 = lambda wildcards: ["out/bbduk_noPhiX_fastuniq/" + sample + "_R2.fastq.gz" for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
+        read1 = lambda wildcards: ['out/bbduk_noPhiX_fastuniq/' + sample + '_R1.fastq.gz' for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
+        read2 = lambda wildcards: ['out/bbduk_noPhiX_fastuniq/' + sample + '_R2.fastq.gz' for sample in list(METADATA[METADATA.co_assembly == wildcards.assembly].index)],
         bowtie2_index = 'out/megahit/{assembly}/bowtie2_index.1.bt2' # just one of the files
     output:
         temp('out/megahit/{assembly}/bowtie2_mapping/{assembly}.sam')
@@ -792,9 +792,9 @@ rule prokka:
 # gets list of expected prokka outputs for given assembly based on bins generated by maxbin2
 def expected_prokka_outputs(wildcards):
     checkpoint_output = checkpoints.maxbin2.get(**wildcards).output[0]
-    return expand("out/maxbin2_prokka/{assembly}/{bin}/{bin}.gff",
+    return expand('out/maxbin2_prokka/{assembly}/{bin}/{bin}.gff',
         assembly = wildcards.assembly,
-        bin = glob_wildcards(os.path.join(checkpoint_output, "{bin}.fasta")).bin)
+        bin = glob_wildcards(os.path.join(checkpoint_output, '{bin}.fasta')).bin)
 
 # creates donefile for given assembly once expected prokka outputs are present
 rule make_prokka_donefile:
