@@ -593,6 +593,7 @@ rule bowtie2_mapping:
         -x {params.bt2_index} --no-unal --threads {threads} -S {output} 2>{log}
         '''
 
+# consider adding .bai file to output here, and to inputs for other rules
 rule bowtie2_compress_sort_index:
     input:
         'out/megahit/{assembly}/bowtie2_mapping/{assembly}.sam'
