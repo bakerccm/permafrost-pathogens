@@ -691,7 +691,7 @@ checkpoint maxbin2:
 # all output from concoct_coverage_table rule
 rule all_concoct:
     input:
-        expand('out/concoct/{assembly}/coverage_table.tsv', assembly = SAMPLING_LOCATIONS)
+        expand('out/concoct/{assembly}/results', assembly = SAMPLING_LOCATIONS)
 
 # cut up contigs into smaller parts
 # see https://concoct.readthedocs.io/en/latest/scripts/cut_up_fasta.html
@@ -726,6 +726,26 @@ rule concoct_coverage_table:
         'envs/concoct-1.1.0.yaml'
     shell:
         'concoct_coverage_table.py {input.bedfile} {input.bamfiles} > {output}'
+
+# run concoct
+# see command line options here: https://concoct.readthedocs.io/en/latest/cmd_options.html
+rule concoct:
+    input:
+        fasta = 'out/concoct/{assembly}/contigs_cut.fa',
+        coverage = 'out/concoct/{assembly}/coverage_table.tsv'
+    output:
+        directory('out/concoct/{assembly}/results')
+    conda:
+        'envs/concoct-1.1.0.yaml'
+    threads:
+        config['concoct']['concoct']['threads']
+    shell:
+        '''
+        concoct --composition_file {input.fasta} \
+            --coverage_file {input.coverage} \
+            --basename {output}/ \
+            --threads {threads}
+        '''
 
 ################################
 ## use checkM to assess putative genomes

@@ -61,6 +61,8 @@ concoct:
     cut_up_fasta:
         chunk_size: 10000
         overlap_size: 0
+    concoct:
+        threads: 12
 
 checkm:
     threads: 12
