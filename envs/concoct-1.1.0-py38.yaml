@@ -1,0 +1,8 @@
+name: concoct-1.1.0-py38
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - python=3.8
+ - concoct=1.1.0

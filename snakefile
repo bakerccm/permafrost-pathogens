@@ -736,7 +736,7 @@ rule concoct:
     output:
         directory('out/concoct/{assembly}/results')
     conda:
-        'envs/concoct-1.1.0.yaml'
+        'envs/concoct-1.1.0-py38.yaml'
     threads:
         config['concoct']['concoct']['threads']
     shell:
@@ -746,6 +746,10 @@ rule concoct:
             --basename {output}/ \
             --threads {threads}
         '''
+
+# merge subcontig clustering into original contig clustering
+# see https://concoct.readthedocs.io/en/latest/scripts/merge_cutup_clustering.html
+# merge_cutup_clustering.py concoct_output/clustering_gt1000.csv > concoct_output/clustering_merged.csv
 
 ################################
 ## use checkM to assess putative genomes
